@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<title>Distant Front</title>
+<link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+<link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+<link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+{{ template "header" . }}
+
+{{ with .Observer.State }}
+<div class="container">
+	<div class="columns">
+		<div class="column col-sm-8">
+			<h3>Summary</h3>
+			<div id="summary">
+				{{ with .Summary }}
+				<p id="welcome-message">
+					{{ markup .AutoServer.WelcomeMessage }}
+				</p>
+				{{ end }}
+			</div>
+		</div>
+		<div class="column col-sm-4">
+			<h3>Playlist</h3>
+			<div id="playlist">
+				{{ range .PlaylistState.Playlist.Levels }}
+				<div class="playlist-entry">
+					<p class="playlist-name">{{ .Name }}</p>
+				</div>
+				{{ end }}
+			</div>
+		</div>
+	</div>
+</div>
+{{ end }}

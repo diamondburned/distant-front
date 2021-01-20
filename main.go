@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/diamondburned/distant-front/internal/frontend"
+	"github.com/diamondburned/distant-front/internal/server"
 	"github.com/diamondburned/distant-front/lib/distance"
-	"github.com/diamondburned/distant-front/lib/workshop"
 	"github.com/joho/godotenv"
 )
 
@@ -22,16 +23,12 @@ func main() {
 	}
 
 	obs := distance.NewObserver(c, time.Second)
-	state := obs.State()
 
-	level := state.Playlist.Playlist.Levels[0]
+	h := server.New(frontend.RenderState{
+		Client:   c,
+		Observer: obs,
+	})
 
-	workshopFile, err := workshop.GetFile(level.WorkshopFileID)
-	if err != nil {
-		log.Fatalln("failed to get workshop file:", err)
-	}
-
-	fmt.Println("workshop file URL:", workshopFile.SizedImageURL(128))
-
-	time.Sleep(time.Minute)
+	log.Println("Listen and serve at :8081")
+	log.Fatalln(http.ListenAndServe(":8081", h))
 }

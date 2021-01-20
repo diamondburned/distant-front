@@ -105,9 +105,9 @@ type Observer struct {
 
 // ObservedState describes the last observed state.
 type ObservedState struct {
-	Summary   *Summary
-	Playlist  *PlaylistState
-	LastRenew time.Time
+	Summary       *Summary
+	PlaylistState *PlaylistState
+	LastRenew     time.Time
 }
 
 // NewObserver creates a new periodic observer.
@@ -172,7 +172,7 @@ func (obs *Observer) refetch(tick time.Time) {
 	defer obs.mutex.Unlock()
 
 	obs.state.LastRenew = tick
-	obs.state.Playlist = playlist
+	obs.state.PlaylistState = playlist
 	obs.state.Summary = summary
 }
 
