@@ -1,6 +1,10 @@
 package distance
 
-import "net/url"
+import (
+	"math"
+	"net/url"
+	"time"
+)
 
 // Summary is the structure of a summary response from /summary.
 type Summary struct {
@@ -10,6 +14,28 @@ type Summary struct {
 	Players      []Player
 	AutoServer   AutoServer
 	VoteCommands VoteCommands
+}
+
+// LatestMessages returns the latest messages with a maximum.
+func (s Summary) LatestMessages(max int) []ChatMessage {
+	start := len(s.ChatLog) - max
+	if start < 0 {
+		start = 0
+	}
+	return s.ChatLog[start:]
+}
+
+// Server describes the server in Summary.
+type Server struct {
+	CurrentLevelID               int64 `json:"CurrentLevelId"`
+	MaxPlayers                   int64
+	Port                         int64
+	ReportToMasterServer         bool
+	MasterServerGameModeOverride string
+	DistanceVersion              int64
+	IsInLobby                    bool
+	HasModeStarted               bool
+	ModeStartTime                float64
 }
 
 // AutoServer is part of Summary.
@@ -30,6 +56,12 @@ type ChatMessage struct {
 	Chat        string
 	Type        ChatMessageType
 	Description string
+}
+
+// Time returns the timestamp in time.Time.
+func (msg ChatMessage) Time() time.Time {
+	sec, f := math.Modf(msg.Timestamp)
+	return time.Unix(int64(sec), int64(float64(time.Second)*f))
 }
 
 // ChatMessageType is the enumerated type for a message's type.
@@ -53,10 +85,15 @@ type Level struct {
 	Difficulty        string
 }
 
+// WorkshopURL returns the workshop URL to this level.
+func (lvl Level) WorkshopURL() string {
+	return "https://steamcommunity.com/sharedfiles/filedetails/?id=" + lvl.WorkshopFileID
+}
+
 // Player describes a player in Summary.
 type Player struct {
-	UnityPlayerGUID        string `json:"UnityPlayerGuid"`
-	State                  PlayerState
+	UnityPlayerGUID        string      `json:"UnityPlayerGuid"`
+	State                  PlayerState `json:"State,string"`
 	Stuck                  bool
 	LevelID                int `json:"LevelId"`
 	ReceivedInfo           bool
@@ -114,19 +151,6 @@ type Car struct {
 	AngularVelocity []float32
 
 	// TODO: FinishType
-}
-
-// Server describes the server in Summary.
-type Server struct {
-	CurrentLevelID               int64 `json:"CurrentLevelId"`
-	MaxPlayers                   int64
-	Port                         int64
-	ReportToMasterServer         bool
-	MasterServerGameModeOverride string
-	DistanceVersion              int64
-	IsInLobby                    bool
-	HasModeStarted               bool
-	ModeStartTime                float64
 }
 
 // VoteCommands describes the vote commands in Summary.

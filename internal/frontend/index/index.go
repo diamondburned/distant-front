@@ -1,6 +1,7 @@
 package index
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/diamondburned/distant-front/internal/frontend"
@@ -25,5 +26,7 @@ type renderData struct {
 }
 
 func renderIndex(w http.ResponseWriter, r *http.Request) {
-	index.Execute(w, frontend.GetRenderState(r.Context()))
+	if err := index.Execute(w, frontend.GetRenderState(r.Context())); err != nil {
+		log.Println("Error rendering:", err)
+	}
 }

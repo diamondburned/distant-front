@@ -19,6 +19,21 @@ var Client = http.Client{
 	Timeout: 8 * time.Second,
 }
 
+// SizedImageURL returns the image URL with the given size. It returns the
+// original URL if it fails to do so.
+func SizedImageURL(imageURL string, size int) string {
+	u, err := url.Parse(imageURL)
+	if err != nil {
+		return imageURL
+	}
+
+	v := u.Query()
+	v.Set("imw", strconv.Itoa(size))
+	u.RawQuery = v.Encode()
+
+	return u.String()
+}
+
 // File is a workshop shared file.
 type File struct {
 	Title string
@@ -28,16 +43,7 @@ type File struct {
 // SizedImageURL returns the image URL with the given size. It returns the
 // original URL if it fails to do so.
 func (f File) SizedImageURL(size int) string {
-	u, err := url.Parse(f.Image)
-	if err != nil {
-		return f.Image
-	}
-
-	v := u.Query()
-	v.Set("imw", strconv.Itoa(size))
-	u.RawQuery = v.Encode()
-
-	return u.String()
+	return SizedImageURL(f.Image, size)
 }
 
 var (

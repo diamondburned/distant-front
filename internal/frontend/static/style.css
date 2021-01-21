@@ -1,0 +1,60 @@
+:root {
+	--glow: 0px 0px 4px 0px rgba(128,127,226,0.5);
+}
+
+header.navbar {
+	padding: 16px 24px;
+}
+
+/* body > div.container > div.columns > div.column.side { */
+/* 	max-width: 400px; */
+/* } */
+
+div.card {
+	box-shadow: 0px 0px 6px -2px rgba(0,0,0,0.2);
+	border-radius: 4px;
+	margin-bottom: 0.8rem;
+}
+
+div.card-body div.empty {
+	background: none;
+	padding-top:    0rem;
+	padding-bottom: 1rem;
+}
+
+div.playlist-entry {
+	padding: 0.2rem 0.3rem;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+div.active-playlist {
+	border-color: #807fe2;
+	box-shadow: var(--glow), inset var(--glow);
+}
+
+div.playlist-entry img.playlist-thumb {
+	width:  56px;
+	height: auto;
+	border-radius: 4px;
+}
+
+div.playlist-entry div.tile-icon {
+	display: contents;
+}
+
+div.playlist-entry div.tile-content {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+div#players > div.card-header {
+    display: flex;
+	align-items: center;
+    justify-content: space-between;
+}
+
+div#chat small.timestamp {
+	opacity: 0.75;
+	margin-right: 0.25rem;
+}

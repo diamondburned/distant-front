@@ -7,7 +7,7 @@ import (
 
 // PlaylistState is the state of the server and its playlist.
 type PlaylistState struct {
-	CurrentLevelIndex int64
+	CurrentLevelIndex int
 	Playlist          Playlist
 }
 
@@ -32,7 +32,9 @@ func (c *Client) AllPlaylist() (*PlaylistState, error) {
 
 		state.CurrentLevelIndex = s.CurrentLevelIndex
 		state.Playlist.Levels = append(state.Playlist.Levels, s.Playlist.Levels...)
-		state.Playlist.Start = len(state.Playlist.Levels)
+
+		last := state.Playlist.Levels[len(state.Playlist.Levels)-1]
+		state.Playlist.Start = last.Index + 1
 
 		if state.Playlist.Start >= s.Playlist.Total {
 			break

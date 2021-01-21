@@ -3,13 +3,16 @@ package markup
 
 import (
 	"html"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/lucasb-eyer/go-colorful"
 )
 
-// tagMatcherRegex matches all regexes. It is copy-pasted from the Distance
-// server implementation.
+// tagMatcherRegex matches all tags. It is copy-pasted from the Distance server
+// implementation.
 var tagMatcherRegex = regexp.MustCompile(
 	`\[(?:[0-9A-F]{6}|\/?b|\/?i|\/?u|\/?s|\/?c|\-|\/?sub|\/?sup|\/?url|url=[^\]]*)\]`)
 
@@ -17,12 +20,35 @@ func tagBody(tag string) string {
 	return strings.Trim(tag, "[]")
 }
 
-func isHex(body string) bool {
-	if len(body) != 6 {
-		return false
+// ColorModifier is a dynamic function to modify text colors.
+var ColorModifier = hex
+
+// Darken sets into ColorModifier to darken the color by the given alpha.
+func Darken(saturateDelta, valueDelta float64) func(string) string {
+	return func(body string) string {
+		color, err := colorful.Hex("#" + body)
+		if err != nil {
+			return ""
+		}
+
+		h, s, v := color.Hsv()
+		s = math.Min(1, math.Max(0, s+saturateDelta))
+		v = math.Min(1, math.Max(0, v+valueDelta))
+
+		body = colorful.Hsv(h, s, v).Hex()
+		return body[1:] // trim '#'
 	}
-	_, err := strconv.ParseInt(body, 16, 32)
-	return err == nil
+}
+
+func hex(body string) string {
+	if len(body) != 6 {
+		return ""
+	}
+	_, err := strconv.ParseUint(body, 16, 32)
+	if err != nil {
+		return ""
+	}
+	return body
 }
 
 type tagStack struct {
@@ -102,9 +128,9 @@ func ToHTML(markup string) string {
 		}
 
 		// attempt to parse the color
-		if isHex(tagBody) {
+		if hex := ColorModifier(tagBody); hex != "" {
 			buf.WriteString(`<span style="color:#`)
-			buf.WriteString(tagBody)
+			buf.WriteString(hex)
 			buf.WriteString(`">`)
 
 			stack.add("-", "</span>")

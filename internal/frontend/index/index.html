@@ -3,30 +3,100 @@
 <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
 <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
 <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+<link rel="stylesheet" href="/static/style.css">
 
 {{ template "header" . }}
 
+{{ define "empty-card" }}
+<div class="empty">
+	<p class="empty-subtitle">{{ . }}</p>
+</div>
+{{ end }}
+
 {{ with .Observer.State }}
-<div class="container">
+<div class="container grid-lg">
 	<div class="columns">
-		<div class="column col-sm-8">
-			<h3>Summary</h3>
-			<div id="summary">
-				{{ with .Summary }}
-				<p id="welcome-message">
-					{{ markup .AutoServer.WelcomeMessage }}
-				</p>
-				{{ end }}
-			</div>
-		</div>
-		<div class="column col-sm-4">
-			<h3>Playlist</h3>
-			<div id="playlist">
-				{{ range .PlaylistState.Playlist.Levels }}
-				<div class="playlist-entry">
-					<p class="playlist-name">{{ .Name }}</p>
+		<div class="column col-8 col-md-12">
+			{{ with .Summary }}
+			<div id="summary" class="card">
+				<div class="card-header">
+					<div class="card-title h5">Summary</div>
 				</div>
-				{{ end }}
+				<div class="card-body">
+					<p id="welcome-message">
+						{{ markup .AutoServer.WelcomeMessage }}
+					</p>
+					Current Map:
+					<a href="#playlist-{{.Level.RelativeLevelPath}}">{{ .Level.Name }}</a>
+				</div>
+			</div>
+
+			<div id="players" class="card">
+				<div class="card-header">
+					<div class="card-title h5">Players</div>
+					<span class="chip">{{ len .Players }} / {{ .Server.MaxPlayers }}</span>
+				</div>
+				<div class="card-body">
+					{{ range .Players }}
+					{{ else }}
+					{{ template "empty-card" "No Players" }}
+					{{ end }}
+				</div>
+			</div>
+
+			<div id="chat" class="card">
+				<div class="card-header">
+					<div class="card-title h5">Chat</div>
+				</div>
+				<div class="card-body">
+					{{ range (.LatestMessages 6) }}
+					<div class="tile message">
+						<div class="tile-content">
+							<small class="tile-subtitle timestamp">
+								{{ .Time.Format "3:04PM" }}
+							</small>
+							{{ markup .Chat }}
+						</div>
+					</div>
+					{{ else }}
+					{{ template "empty-card" "Empty" }}
+					{{ end }}
+				</div>
+			</div>
+			{{ end }}
+		</div>
+
+		<div class="column col-4 col-md-12 side">
+			<div id="playlist" class="card">
+				<div class="card-header">
+					<div class="card-title h5">Playlist</div>
+				</div>
+				<div class="card-body p-0">
+					{{ $activeID := .PlaylistState.CurrentLevelIndex }}
+					{{ range .PlaylistState.Playlist.Levels }}
+					<div
+						id="playlist-{{.RelativeLevelPath}}"
+						class="
+							playlist-entry tile tile-centered
+							{{ if (eq $activeID .Index) }} active-playlist {{ end }}"
+					>
+						<div class="tile-icon">
+							<img
+								class="playlist-thumb" alt="Thumbnail"
+								src="/workshopimg/{{.WorkshopFileID}}?size=128"
+							/>
+						</div>
+						<div class="tile-content">
+							<div class="tile-title">
+								<a target="_blank" loading="lazy" href="{{ .WorkshopURL }}">
+									{{ .Name }}
+								</a>
+							</div>
+							<small class="title-subtitle">{{ .GameMode }}</small>
+						</div>
+					</div>
+					{{ end }}
+				</div>
 			</div>
 		</div>
 	</div>

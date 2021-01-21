@@ -3,11 +3,13 @@ package frontend
 import (
 	"context"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
 	"github.com/diamondburned/distant-front/lib/distance/markup"
+	"github.com/phogolabs/parcello"
 )
 
 //go:generate go run github.com/phogolabs/parcello/cmd/parcello -r -i *.go
@@ -53,4 +55,14 @@ func GetRenderState(ctx context.Context) RenderState {
 		panic("no render state in context")
 	}
 	return renderState
+}
+
+// MountStatic mounts the static route.
+func MountStatic() http.Handler {
+	d, err := parcello.Manager.Dir("static/")
+	if err != nil {
+		log.Fatalln("Static not found:", err)
+	}
+
+	return http.StripPrefix("/static", http.FileServer(d))
 }
