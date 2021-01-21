@@ -5,10 +5,12 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
 	"github.com/diamondburned/distant-front/lib/distance/markup"
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/phogolabs/parcello"
 )
 
@@ -16,12 +18,22 @@ import (
 
 var Templater = tmplutil.Templater{
 	Includes: map[string]string{
-		"header": "components/header.html",
-		"footer": "components/footer.html",
+		"css":        "components/css.html",
+		"header":     "components/header.html",
+		"footer":     "components/footer.html",
+		"empty-card": "components/empty-card.html",
 	},
 	Functions: template.FuncMap{
 		"markup": func(input string) template.HTML {
 			return template.HTML(markup.ToHTML(input))
+		},
+		"rgbaHex": func(rgba [4]float32) string {
+			color := colorful.FastLinearRgb(
+				float64(rgba[0]),
+				float64(rgba[1]),
+				float64(rgba[2]),
+			)
+			return color.Hex()
 		},
 	},
 }
@@ -33,9 +45,10 @@ const (
 )
 
 type RenderState struct {
-	Client   *distance.Client
-	Observer *distance.Observer
-	SiteName string
+	Client      *distance.Client
+	Observer    *distance.Observer
+	SiteName    string
+	DistanceURL *url.URL
 }
 
 // InjectRenderState injects the render state.
@@ -55,6 +68,13 @@ func GetRenderState(ctx context.Context) RenderState {
 		panic("no render state in context")
 	}
 	return renderState
+}
+
+// ExecuteTemplate executes the template with the RenderState.
+func ExecuteTemplate(w http.ResponseWriter, r *http.Request, sub *tmplutil.Subtemplate) {
+	if err := sub.Execute(w, GetRenderState(r.Context())); err != nil {
+		log.Println("Error rendering:", err)
+	}
 }
 
 // MountStatic mounts the static route.

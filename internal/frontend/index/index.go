@@ -1,11 +1,10 @@
 package index
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/diamondburned/distant-front/internal/frontend"
-	"github.com/diamondburned/distant-front/lib/distance"
+	"github.com/diamondburned/distant-front/internal/frontend/index/chat"
 	"github.com/go-chi/chi"
 )
 
@@ -17,16 +16,13 @@ func Mount(rs frontend.RenderState) http.Handler {
 
 	r := chi.NewRouter()
 	r.Use(frontend.InjectRenderState(rs))
+
+	r.Mount("/chat", chat.Mount())
 	r.Get("/", renderIndex)
+
 	return r
 }
 
-type renderData struct {
-	distance.ObservedState
-}
-
 func renderIndex(w http.ResponseWriter, r *http.Request) {
-	if err := index.Execute(w, frontend.GetRenderState(r.Context())); err != nil {
-		log.Println("Error rendering:", err)
-	}
+	frontend.ExecuteTemplate(w, r, index)
 }

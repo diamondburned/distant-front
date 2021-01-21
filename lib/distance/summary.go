@@ -92,8 +92,8 @@ func (lvl Level) WorkshopURL() string {
 
 // Player describes a player in Summary.
 type Player struct {
-	UnityPlayerGUID        string      `json:"UnityPlayerGuid"`
-	State                  PlayerState `json:"State,string"`
+	UnityPlayerGUID        string `json:"UnityPlayerGuid"`
+	State                  PlayerState
 	Stuck                  bool
 	LevelID                int `json:"LevelId"`
 	ReceivedInfo           bool
@@ -111,20 +111,20 @@ type Player struct {
 }
 
 // PlayerState describes the current state of a Player in Summary.
-type PlayerState uint16
+type PlayerState string
 
 const (
-	PlayerInitializing PlayerState = iota
-	PlayerInitialized
-	PlayerLoadingLobbyScene
-	PlayerLoadedLobbyScene
-	PlayerSubmittedLobbyInfo
-	PlayerWaitingForCompatibilityStatus
-	PlayerLoadingGameModeScene
-	PlayerLoadedGameModeScene
-	PlayerSubmittedGameModeInfo
-	PlayerStartedMode
-	PlayerCantLoadLevelSoInLobby
+	PlayerInitializing                  PlayerState = "Initializing"
+	PlayerInitialized                   PlayerState = "Initialized"
+	PlayerLoadingLobbyScene             PlayerState = "LoadingLobbyScene"
+	PlayerLoadedLobbyScene              PlayerState = "LoadedLobbyScene"
+	PlayerSubmittedLobbyInfo            PlayerState = "SubmittedLobbyInfo"
+	PlayerWaitingForCompatibilityStatus PlayerState = "WaitingForCompatibilityStatus"
+	PlayerLoadingGameModeScene          PlayerState = "LoadingGameModeScene"
+	PlayerLoadedGameModeScene           PlayerState = "LoadedGameModeScene"
+	PlayerSubmittedGameModeInfo         PlayerState = "SubmittedGameModeInfo"
+	PlayerStartedMode                   PlayerState = "StartedMode"
+	PlayerCantLoadLevelSoInLobby        PlayerState = "CantLoadLevelSoInLobby"
 )
 
 // LevelCompatibilityInfo describes the level compatibility information from
@@ -137,8 +137,8 @@ type LevelCompatibilityInfo struct {
 
 // Car describes a Player's car in Summary.
 type Car struct {
-	Colors          [][]float32 `json:"CarColors"`
-	Name            string      `json:"CarName"`
+	Colors          [][4]float32 `json:"CarColors"`
+	Name            string       `json:"CarName"`
 	Points          int
 	Finished        bool
 	FinishData      int

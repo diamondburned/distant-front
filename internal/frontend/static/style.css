@@ -6,9 +6,16 @@ header.navbar {
 	padding: 16px 24px;
 }
 
-/* body > div.container > div.columns > div.column.side { */
-/* 	max-width: 400px; */
-/* } */
+div.mini-table {
+	display: grid;
+	grid-column-gap: 0.4rem;
+	grid-template-columns: auto 1fr;
+}
+
+div.mini-table span:nth-child(odd) {
+	opacity: 0.75;
+	text-align: right;
+}
 
 div.card {
 	box-shadow: 0px 0px 6px -2px rgba(0,0,0,0.2);
@@ -48,13 +55,97 @@ div.playlist-entry div.tile-content {
 	justify-content: space-between;
 }
 
-div#players > div.card-header {
+#chat-iframe {
+	width:  100%;
+	height: 200px;
+}
+
+div.messages {
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+div#players div.player,
+div#players div.card-header {
     display: flex;
 	align-items: center;
     justify-content: space-between;
 }
 
-div#chat small.timestamp {
+div#players div.player-info,
+div#players div.player-car,
+div#players div.player-car div.car-colors {
+	display: flex;
+	align-items: flex-start;
+}
+
+div.player-info div.car-pts {
+	width: 1.3rem;
 	opacity: 0.75;
-	margin-right: 0.25rem;
+	text-align: right;
+	margin-right: 0.5rem;
+}
+
+div.car-colors {
+	margin-left:   0.4rem;
+	border-radius: 3px;
+	overflow: hidden;
+
+	border: 1px solid black;
+	box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+}
+
+div.car-colors > div {
+	background-color: var(--c);
+	width:  0.6rem;
+	height: 0.9rem;
+}
+
+div.car-colors > div:not(:last-child) {
+	border-right: 1px solid black;
+}
+
+div.refresh-bar,
+div.refresh-bar div.refresh-inner {
+	width: 25px;
+	height: 5px;
+
+	overflow: hidden;
+	border-radius: 25px;
+
+	background-color: rgba(0, 0, 0, 0.15);
+	transition: linear 75ms background-color;
+}
+
+div.refresh-bar.waiting div.refresh-inner {
+	animation: expand 5s;
+	animation-timing-function: linear;
+	animation-iteration-count: 1;
+
+	background-color: rgba(0, 0, 0, 0.55);
+}
+div.refresh-bar.refreshing div.refresh-inner {
+	animation: breathing 150ms;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+
+	background-color: #ffd200;
+}
+div.refresh-bar.error div.refresh-inner {
+	animation: breathing 1s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+
+	background-color: #ff0e00;
+}
+
+@keyframes expand {
+	from { width:  0px; }
+	to   { width: 25px; }
+}
+
+@keyframes breathing {
+	  0% { opacity: 95%; }
+	 50% { opacity: 15%; }
+	100% { opacity: 95%; }
 }

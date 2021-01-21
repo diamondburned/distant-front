@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"time"
@@ -24,7 +25,12 @@ func main() {
 	// Make all colors darker.
 	markup.ColorModifier = markup.Darken(+0.5, -0.25)
 
-	c, err := distance.NewClient(os.Getenv("DISTANCE_ENDPOINT"))
+	distanceURL, err := url.Parse(os.Getenv("DISTANCE_ENDPOINT"))
+	if err != nil {
+		log.Fatalln("invalid $DISTANCE_ENDPOINT:", err)
+	}
+
+	c, err := distance.NewClient(distanceURL.String())
 	if err != nil {
 		log.Fatalln("failed to crete Distance client:", err)
 	}
@@ -37,9 +43,10 @@ func main() {
 	}
 
 	rs := frontend.RenderState{
-		Client:   c,
-		Observer: distance.NewObserver(c, time.Second),
-		SiteName: "Distant Front",
+		Client:      c,
+		Observer:    distance.NewObserver(c, time.Second),
+		SiteName:    "Distant Front",
+		DistanceURL: distanceURL,
 	}
 
 	r := chi.NewRouter()

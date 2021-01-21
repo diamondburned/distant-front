@@ -1,33 +1,32 @@
 <!DOCTYPE html>
 <title>Distant Front</title>
-<link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-<link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
-<link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
-<link rel="stylesheet" href="/static/style.css">
 
+{{ template "css" . }}
 {{ template "header" . }}
 
-{{ define "empty-card" }}
-<div class="empty">
-	<p class="empty-subtitle">{{ . }}</p>
-</div>
-{{ end }}
-
+{{ $distanceHost := .DistanceURL.Hostname }}
 {{ with .Observer.State }}
-<div class="container grid-lg">
+<div class="container grid-lg" id="main">
 	<div class="columns">
-		<div class="column col-8 col-md-12">
+		<div class="column col-8 col-xs-12">
 			{{ with .Summary }}
 			<div id="summary" class="card">
 				<div class="card-header">
-					<div class="card-title h5">Summary</div>
+					<div class="card-title h5">Server</div>
 				</div>
-				<div class="card-body">
-					<p id="welcome-message">
-						{{ markup .AutoServer.WelcomeMessage }}
-					</p>
-					Current Map:
-					<a href="#playlist-{{.Level.RelativeLevelPath}}">{{ .Level.Name }}</a>
+				<div class="card-body mini-table">
+					<span>Address</span>
+					<span id="address">{{$distanceHost}}:{{.Server.Port}}</span>
+
+					<span>Gamemode</span>
+					<span id="gamemode">{{ .Server.MasterServerGameModeOverride }}</span>
+
+					<span>Current Map</span>
+					<span id="current-map">
+						<a href="#playlist-{{.Level.RelativeLevelPath}}">
+							{{ .Level.Name }}
+						</a>
+					</span>
 				</div>
 			</div>
 
@@ -38,6 +37,29 @@
 				</div>
 				<div class="card-body">
 					{{ range .Players }}
+					<div class="player tile tile-centered">
+						<div class="player-info">
+							<div class="car-pts">{{ .Car.Points }}</div>
+							<div>
+								<span>{{ .Name }}</span>
+								{{      if .Car.Finished }}
+								<span title="Finished">🏁</span>
+								{{ else if .Car.Spectator }}
+								<span title="Spectating">🔭</span>
+								{{ else if not .Car.Alive }}
+								<span title="Alive">💀</span>
+								{{ end }}
+							</div>
+						</div>
+						<div class="player-car">
+							<span>{{ .Car.Name }}</span>
+							<div class="car-colors">
+								{{ range (slice .Car.Colors 0 3) }}
+								<div style="--c: {{rgbaHex .}}"></div>
+								{{ end }}
+							</div>
+						</div>
+					</div>
 					{{ else }}
 					{{ template "empty-card" "No Players" }}
 					{{ end }}
@@ -51,12 +73,7 @@
 				<div class="card-body">
 					{{ range (.LatestMessages 6) }}
 					<div class="tile message">
-						<div class="tile-content">
-							<small class="tile-subtitle timestamp">
-								{{ .Time.Format "3:04PM" }}
-							</small>
-							{{ markup .Chat }}
-						</div>
+						<div class="tile-content">{{ markup .Chat }}</div>
 					</div>
 					{{ else }}
 					{{ template "empty-card" "Empty" }}
@@ -66,7 +83,7 @@
 			{{ end }}
 		</div>
 
-		<div class="column col-4 col-md-12 side">
+		<div class="column col-4 col-xs-12 side">
 			<div id="playlist" class="card">
 				<div class="card-header">
 					<div class="card-title h5">Playlist</div>
@@ -76,9 +93,8 @@
 					{{ range .PlaylistState.Playlist.Levels }}
 					<div
 						id="playlist-{{.RelativeLevelPath}}"
-						class="
-							playlist-entry tile tile-centered
-							{{ if (eq $activeID .Index) }} active-playlist {{ end }}"
+						class="playlist-entry tile tile-centered
+							{{- if (eq $activeID .Index) }} active-playlist {{- end -}}"
 					>
 						<div class="tile-icon">
 							<img
@@ -102,3 +118,6 @@
 	</div>
 </div>
 {{ end }}
+
+<script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
+<script src="/static/refresh.js"></script>

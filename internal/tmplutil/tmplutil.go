@@ -25,6 +25,12 @@ func (tmpler *Templater) Register(name, path string) *Subtemplate {
 	return &Subtemplate{tmpler, name}
 }
 
+// Execute executes any subtemplate.
+func (tmpler *Templater) Execute(w io.Writer, tmpl string, v interface{}) error {
+	tmpler.Preload()
+	return tmpler.tmpl.ExecuteTemplate(w, tmpl, v)
+}
+
 // Preload preloads the templates once. If the templates are already
 // preloaded, then it does nothing.
 func (tmpler *Templater) Preload() {
