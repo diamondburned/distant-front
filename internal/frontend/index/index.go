@@ -53,6 +53,12 @@ func latestMessages(msgs []distance.ChatMessage, max int) []distance.ChatMessage
 		}
 	}
 
+	// We appended the latest ones first, so we have to flip the slice.
+	for i := len(latest)/2 - 1; i >= 0; i-- {
+		opp := len(latest) - 1 - i
+		latest[i], latest[opp] = latest[opp], latest[i]
+	}
+
 	return latest
 }
 

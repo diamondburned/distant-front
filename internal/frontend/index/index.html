@@ -47,21 +47,18 @@
 				{{ range (sortPlayers .Players) }}
 				<div class="player tile tile-centered">
 					<div class="player-info">
-						<div class="car-pts">{{ .Car.Points }}</div>
-						<div>
-							<span>{{ .Name }}</span>
-							{{      if .Car.Finished }}
-							<span title="Finished">🏁</span>
-							{{ else if .Car.Spectator }}
-							<span title="Spectating">🔭</span>
-							{{ else if not .Car.Alive }}
-							<span title="Alive">💀</span>
-							{{ end }}
-						</div>
+						<span>{{ .Name }}</span>
+						{{      if .Car.Finished }}
+						<span title="Finished">🏁</span>
+						{{ else if .Car.Spectator }}
+						<span title="Spectating">🔭</span>
+						{{ else if not .Car.Alive }}
+						<span title="Alive">💀</span>
+						{{ end }}
 					</div>
 					<div class="player-car">
 						<span>{{ .Car.Name }}</span>
-						{{ if (le (len .Car.Colors) 3) }}
+						{{ if (ge (len .Car.Colors) 3) }}
 						<div class="car-colors">
 							{{ range (slice .Car.Colors 0 3) }}
 							<div style="--c: {{rgbaHex .}}"></div>

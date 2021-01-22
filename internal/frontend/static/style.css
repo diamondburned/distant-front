@@ -79,13 +79,6 @@ div#players div.player-car div.car-colors {
 	align-items: flex-start;
 }
 
-div.player-info div.car-pts {
-	width: 1.3rem;
-	opacity: 0.75;
-	text-align: right;
-	margin-right: 0.5rem;
-}
-
 div.car-colors {
 	margin-left:   0.4rem;
 	border-radius: 3px;
@@ -118,7 +111,7 @@ div.refresh-bar div.refresh-inner {
 }
 
 div.refresh-bar.waiting div.refresh-inner {
-	animation: expand 7.5s;
+	animation: expand 5s;
 	animation-timing-function: linear;
 	animation-iteration-count: 1;
 
