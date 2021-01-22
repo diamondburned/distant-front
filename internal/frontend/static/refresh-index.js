@@ -36,5 +36,5 @@ async function update() {
   loading.render();
 }
 
-setInterval(update, 5000);
+setInterval(update, 7500);
 loading.render();

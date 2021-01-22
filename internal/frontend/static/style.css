@@ -118,7 +118,7 @@ div.refresh-bar div.refresh-inner {
 }
 
 div.refresh-bar.waiting div.refresh-inner {
-	animation: expand 5s;
+	animation: expand 7.5s;
 	animation-timing-function: linear;
 	animation-iteration-count: 1;
 
