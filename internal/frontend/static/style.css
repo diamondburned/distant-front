@@ -79,6 +79,10 @@ div#players div.player-car div.car-colors {
 	align-items: flex-start;
 }
 
+div.player-info span.flag {
+	padding-left: 6px;
+}
+
 div.car-colors {
 	margin-left:   0.4rem;
 	border-radius: 3px;

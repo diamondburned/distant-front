@@ -49,11 +49,11 @@
 					<div class="player-info">
 						<span>{{ .Name }}</span>
 						{{      if .Car.Finished }}
-						<span title="Finished">🏁</span>
+						<span class="flag" title="Finished">🏁</span>
 						{{ else if .Car.Spectator }}
-						<span title="Spectating">🔭</span>
+						<span class="flag" title="Spectating">🔭</span>
 						{{ else if not .Car.Alive }}
-						<span title="Alive">💀</span>
+						<span class="flag" title="Alive">💀</span>
 						{{ end }}
 					</div>
 					<div class="player-car">
