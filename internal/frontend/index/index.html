@@ -4,7 +4,9 @@
 {{ template "css" . }}
 {{ template "header" . }}
 
-{{ template "index-body" . }}
+<div class="container grid-lg refresh-me" id="index">
+	{{ template "index-body" . }}
+</div>
 
 <script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
 <script src="/static/refresh-index.js"></script>
@@ -13,115 +15,113 @@
 
 {{ $distanceHost := .DistanceURL.Hostname }}
 {{ with .Observer.State }}
-<div class="container grid-lg refresh-me" id="index">
-	<div class="columns">
-		<div class="column col-8 col-xs-12">
-			{{ with .Summary }}
-			<div id="summary" class="card">
-				<div class="card-header">
-					<div class="card-title h5">Server</div>
-				</div>
-				<div class="card-body mini-table">
-					<span>Address</span>
-					<span id="address">{{$distanceHost}}:{{.Server.Port}}</span>
-
-					<span>Gamemode</span>
-					<span id="gamemode">{{ .Server.MasterServerGameModeOverride }}</span>
-
-					<span>Current Map</span>
-					<span id="current-map">
-						<a href="#playlist-{{.Level.RelativeLevelPath}}">
-							{{ .Level.Name }}
-						</a>
-					</span>
-				</div>
+<div class="columns">
+	<div class="column col-8 col-xs-12">
+		{{ with .Summary }}
+		<div id="summary" class="card">
+			<div class="card-header">
+				<div class="card-title h5">Server</div>
 			</div>
+			<div class="card-body mini-table">
+				<span>Address</span>
+				<span id="address">{{$distanceHost}}:{{.Server.Port}}</span>
 
-			<div id="players" class="card">
-				<div class="card-header">
-					<div class="card-title h5">Players</div>
-					<span class="chip">{{ len .Players }} / {{ .Server.MaxPlayers }}</span>
-				</div>
-				<div class="card-body">
-					{{ range (sortPlayers .Players) }}
-					<div class="player tile tile-centered">
-						<div class="player-info">
-							<div class="car-pts">{{ .Car.Points }}</div>
-							<div>
-								<span>{{ .Name }}</span>
-								{{      if .Car.Finished }}
-								<span title="Finished">🏁</span>
-								{{ else if .Car.Spectator }}
-								<span title="Spectating">🔭</span>
-								{{ else if not .Car.Alive }}
-								<span title="Alive">💀</span>
-								{{ end }}
-							</div>
-						</div>
-						<div class="player-car">
-							<span>{{ .Car.Name }}</span>
-							{{ if (le (len .Car.Colors) 3) }}
-							<div class="car-colors">
-								{{ range (slice .Car.Colors 0 3) }}
-								<div style="--c: {{rgbaHex .}}"></div>
-								{{ end }}
-							</div>
+				<span>Gamemode</span>
+				<span id="gamemode">{{ .Server.MasterServerGameModeOverride }}</span>
+
+				<span>Current Map</span>
+				<span id="current-map">
+					<a href="#playlist-{{.Level.RelativeLevelPath}}">
+						{{ .Level.Name }}
+					</a>
+				</span>
+			</div>
+		</div>
+
+		<div id="players" class="card">
+			<div class="card-header">
+				<div class="card-title h5">Players</div>
+				<span class="chip">{{ len .Players }} / {{ .Server.MaxPlayers }}</span>
+			</div>
+			<div class="card-body">
+				{{ range (sortPlayers .Players) }}
+				<div class="player tile tile-centered">
+					<div class="player-info">
+						<div class="car-pts">{{ .Car.Points }}</div>
+						<div>
+							<span>{{ .Name }}</span>
+							{{      if .Car.Finished }}
+							<span title="Finished">🏁</span>
+							{{ else if .Car.Spectator }}
+							<span title="Spectating">🔭</span>
+							{{ else if not .Car.Alive }}
+							<span title="Alive">💀</span>
 							{{ end }}
 						</div>
 					</div>
-					{{ else }}
-					{{ template "empty-card" "No Players" }}
-					{{ end }}
-				</div>
-			</div>
-
-			<div id="chat" class="card">
-				<div class="card-header">
-					<div class="card-title h5">Chat</div>
-				</div>
-				<div class="card-body">
-					{{ range (latestMessages .ChatLog 6) }}
-					<div class="tile message">
-						<div class="tile-content">{{ markup .Chat }}</div>
+					<div class="player-car">
+						<span>{{ .Car.Name }}</span>
+						{{ if (le (len .Car.Colors) 3) }}
+						<div class="car-colors">
+							{{ range (slice .Car.Colors 0 3) }}
+							<div style="--c: {{rgbaHex .}}"></div>
+							{{ end }}
+						</div>
+						{{ end }}
 					</div>
-					{{ else }}
-					{{ template "empty-card" "Empty" }}
-					{{ end }}
 				</div>
+				{{ else }}
+				{{ template "empty-card" "No Players" }}
+				{{ end }}
 			</div>
-			{{ end }}
 		</div>
 
-		<div class="column col-4 col-xs-12 side">
-			<div id="playlist" class="card">
-				<div class="card-header">
-					<div class="card-title h5">Playlist</div>
+		<div id="chat" class="card">
+			<div class="card-header">
+				<div class="card-title h5">Chat</div>
+			</div>
+			<div class="card-body">
+				{{ range (latestMessages .ChatLog 6) }}
+				<div class="tile message">
+					<div class="tile-content">{{ markup .Chat }}</div>
 				</div>
-				<div class="card-body p-0">
-					{{ $activeID := .PlaylistState.CurrentLevelIndex }}
-					{{ range .PlaylistState.Playlist.Levels }}
-					<div
-						id="playlist-{{.RelativeLevelPath}}"
-						class="playlist-entry tile tile-centered
-							{{- if (eq $activeID .Index) }} active-playlist {{- end -}}"
-					>
-						<div class="tile-icon">
-							<img
-								class="playlist-thumb" alt="Thumbnail"
-								src="/workshopimg/{{.WorkshopFileID}}?size=128"
-							/>
-						</div>
-						<div class="tile-content">
-							<div class="tile-title">
-								<a target="_blank" loading="lazy" href="{{ .WorkshopURL }}">
-									{{ .Name }}
-								</a>
-							</div>
-							<small class="title-subtitle">{{ .GameMode }}</small>
-						</div>
+				{{ else }}
+				{{ template "empty-card" "Empty" }}
+				{{ end }}
+			</div>
+		</div>
+		{{ end }}
+	</div>
+
+	<div class="column col-4 col-xs-12 side">
+		<div id="playlist" class="card">
+			<div class="card-header">
+				<div class="card-title h5">Playlist</div>
+			</div>
+			<div class="card-body p-0">
+				{{ $activeID := .PlaylistState.CurrentLevelIndex }}
+				{{ range .PlaylistState.Playlist.Levels }}
+				<div
+					id="playlist-{{.RelativeLevelPath}}"
+					class="playlist-entry tile tile-centered
+						{{- if (eq $activeID .Index) }} active-playlist {{- end -}}"
+				>
+					<div class="tile-icon">
+						<img
+							class="playlist-thumb" alt="Thumbnail"
+							src="/workshopimg/{{.WorkshopFileID}}?size=128"
+						/>
 					</div>
-					{{ end }}
+					<div class="tile-content">
+						<div class="tile-title">
+							<a target="_blank" loading="lazy" href="{{ .WorkshopURL }}">
+								{{ .Name }}
+							</a>
+						</div>
+						<small class="title-subtitle">{{ .GameMode }}</small>
+					</div>
 				</div>
+				{{ end }}
 			</div>
 		</div>
 	</div>
