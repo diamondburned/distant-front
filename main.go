@@ -54,6 +54,11 @@ func main() {
 	r.Mount("/static", frontend.MountStatic())
 	r.Mount("/", index.Mount(rs))
 
-	log.Println("Listen and serve at :8081")
-	log.Fatalln(http.ListenAndServe(":8081", r))
+	var addr = os.Getenv("DISTANCE_LISTEN")
+	if addr == "" {
+		addr = ":8081"
+	}
+
+	log.Println("Listen and serve at", addr)
+	log.Fatalln(http.ListenAndServe(addr, r))
 }

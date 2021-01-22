@@ -1,4 +1,4 @@
-const chatMessages = document.querySelector("div#chat-box div.chat-messages");
+const chatMessages = document.querySelector("#chat-box > .chat-messages");
 
 function localizeTimeInNode(node) {
   node.querySelector("time").forEach((time) => {
