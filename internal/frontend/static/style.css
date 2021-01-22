@@ -79,6 +79,15 @@ div#players div.player-car div.car-colors {
 	align-items: flex-start;
 }
 
+div.player-info {
+	overflow: hidden;
+}
+
+div.player-info span:first-child {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 div.player-info span.flag {
 	padding-left: 6px;
 }
