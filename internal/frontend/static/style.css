@@ -149,3 +149,23 @@ div.refresh-bar.error div.refresh-inner {
 	 50% { opacity: 15%; }
 	100% { opacity: 95%; }
 }
+
+div#chat-box {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+div#chat-box div.chat-messages {
+	flex: 1;
+	padding: 0 0.4rem;
+	overflow: scroll;
+
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+div.chat-message small.timestamp {
+	opacity: 0.75;
+	margin-right: 0.25rem;
+}

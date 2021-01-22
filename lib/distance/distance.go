@@ -94,6 +94,9 @@ type Observer struct {
 	waitg sync.WaitGroup
 	state ObservedState
 
+	subMu sync.Mutex
+	subs  map[chan ObservedState]struct{}
+
 	// constants
 	client *Client
 	sig    chan struct{}
@@ -114,8 +117,9 @@ type ObservedState struct {
 func NewObserver(c *Client, dura time.Duration) *Observer {
 	obs := Observer{
 		client: c,
-		sig:    make(chan struct{}),
+		sig:    make(chan struct{}, 1), // allow queueing
 		done:   make(chan struct{}),
+		subs:   map[chan ObservedState]struct{}{},
 
 		OnError: func(err error) {
 			log.Println("[distance] Observer error:", err)
@@ -168,12 +172,62 @@ func (obs *Observer) refetch(tick time.Time) {
 
 	obs.waitg.Wait()
 
-	obs.mutex.Lock()
-	defer obs.mutex.Unlock()
+	state := ObservedState{
+		LastRenew:     tick,
+		PlaylistState: playlist,
+		Summary:       summary,
+	}
 
-	obs.state.LastRenew = tick
-	obs.state.PlaylistState = playlist
-	obs.state.Summary = summary
+	obs.mutex.Lock()
+	obs.state = state
+	obs.mutex.Unlock()
+
+	obs.subMu.Lock()
+	defer obs.subMu.Unlock()
+
+	for ch := range obs.subs {
+		select {
+		case ch <- state:
+		default:
+		}
+	}
+}
+
+// Subscribe subscribes to the current observer. The returned channel will be
+// ticked everytime the observed state is updated. If the returned callback is
+// called, the channel will be closed, and the channel will be unsubscribed.
+//
+// If the observee fail to observe the next tick, then it is queued once. All
+// consecutive states will be dropped before the buffer is free again.
+//
+// When the Observer is shut down, its subscribed channels will be closed.
+func (obs *Observer) Subscribe() (<-chan ObservedState, func()) {
+	observee := make(chan ObservedState, 1)
+
+	obs.subMu.Lock()
+	defer obs.subMu.Unlock()
+
+	// If the observer is invalidated, then return an already closed channel.
+	if obs.subs == nil {
+		close(observee)
+		return observee, func() {}
+	}
+
+	obs.subs[observee] = struct{}{}
+
+	return observee, func() {
+		obs.subMu.Lock()
+		// Check that the subscribed state still exists. We should only delete
+		// it if it does.
+		if _, ok := obs.subs[observee]; ok {
+			delete(obs.subs, observee)
+		}
+		obs.subMu.Unlock()
+
+		// Only close the observee channel after deleting from the map and
+		// unlocking to prevent sending to a closed channel.
+		close(observee)
+	}
 }
 
 // State returns the current observed state. The user must not mutate fields
@@ -187,7 +241,13 @@ func (obs *Observer) State() ObservedState {
 
 // Renew queues a renew. It does not wait for the renew to finish.
 func (obs *Observer) Renew() {
-	obs.sig <- struct{}{}
+	// Mark that the observer should be renewed. If the channel is full, then
+	// the observer will eventually be renewed; therefore we don't have to do it
+	// again.
+	select {
+	case obs.sig <- struct{}{}:
+	default:
+	}
 }
 
 // Stop stops the observer. Calling stop more than once does nothing.
@@ -200,4 +260,14 @@ func (obs *Observer) Stop() {
 
 	close(obs.sig)
 	<-obs.done
+
+	// Close all channels.
+	obs.subMu.Lock()
+	defer obs.subMu.Unlock()
+
+	for ch := range obs.subs {
+		close(ch)
+	}
+
+	obs.subs = nil
 }

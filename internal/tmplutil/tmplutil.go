@@ -31,6 +31,14 @@ func (tmpler *Templater) Execute(w io.Writer, tmpl string, v interface{}) error 
 	return tmpler.tmpl.ExecuteTemplate(w, tmpl, v)
 }
 
+// Func registers a function.
+func (tmpler *Templater) Func(name string, fn interface{}) {
+	if _, ok := tmpler.Functions[name]; ok {
+		panic("Duplicate function with name " + name)
+	}
+	tmpler.Functions[name] = fn
+}
+
 // Preload preloads the templates once. If the templates are already
 // preloaded, then it does nothing.
 func (tmpler *Templater) Preload() {

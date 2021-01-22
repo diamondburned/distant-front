@@ -23,7 +23,7 @@ func main() {
 	}
 
 	// Make all colors darker.
-	markup.ColorModifier = markup.Darken(+0.5, -0.25)
+	markup.ColorModifier = markup.Darken(+0.8, -0.2)
 
 	distanceURL, err := url.Parse(os.Getenv("DISTANCE_ENDPOINT"))
 	if err != nil {
@@ -45,7 +45,7 @@ func main() {
 	rs := frontend.RenderState{
 		Client:      c,
 		Observer:    distance.NewObserver(c, time.Second),
-		SiteName:    "Distant Front",
+		SiteName:    os.Getenv("DISTANCE_NAME"),
 		DistanceURL: distanceURL,
 	}
 

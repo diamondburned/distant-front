@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<title>Chat - {{ .SiteName }}</title>
+
+{{ template "css" . }}
+
+{{ define "chat-message" }}
+<div class="tile chat-message">
+	<small class="tile-subtitle timestamp">
+		<time datetime="{{ .Time.UTC.Format "2006-01-02T15:04:05Z" }}"></time>
+	</small>
+	<div class="tile-content">{{ markup .Chat }}</div>
+</div>
+{{ end }}
+
+{{ with .Observer.State }}
+<div id="chat-box" class="container grid-md">
+	<div class="chat-messages">
+		{{ range (reverseMessages .Summary.ChatLog) }}
+		{{ template "chat-message" . }}
+		{{ end }}
+	</div>
+	<div class="chat-send">
+	</div>
+</div>
+{{ end }}
+
+<script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
+<script src="/static/chat.js"></script>

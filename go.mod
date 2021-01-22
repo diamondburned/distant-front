@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/andybalholm/cascadia v1.2.0
+	github.com/cskr/pubsub v1.0.2 // indirect
 	github.com/dgraph-io/badger v1.6.2
 	github.com/go-chi/chi v1.5.1
 	github.com/hexops/autogold v1.2.0

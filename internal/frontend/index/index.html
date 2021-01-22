@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<title>Distant Front</title>
+<title>{{ .SiteName }}</title>
 
 {{ template "css" . }}
 {{ template "header" . }}
@@ -36,7 +36,7 @@
 					<span class="chip">{{ len .Players }} / {{ .Server.MaxPlayers }}</span>
 				</div>
 				<div class="card-body">
-					{{ range .Players }}
+					{{ range (sortPlayers .Players) }}
 					<div class="player tile tile-centered">
 						<div class="player-info">
 							<div class="car-pts">{{ .Car.Points }}</div>
@@ -120,4 +120,4 @@
 {{ end }}
 
 <script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
-<script src="/static/refresh.js"></script>
+<script src="/static/refresh-index.js"></script>
