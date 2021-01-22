@@ -61,7 +61,7 @@
 						{{ if (ge (len .Car.Colors) 3) }}
 						<div class="car-colors">
 							{{ range (slice .Car.Colors 0 3) }}
-							<div style="--c: {{rgbaHex .}}"></div>
+							<div style="background-color: {{rgbaHex .}}"></div>
 							{{ end }}
 						</div>
 						{{ end }}

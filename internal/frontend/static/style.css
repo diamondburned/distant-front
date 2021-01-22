@@ -89,7 +89,6 @@ div.car-colors {
 }
 
 div.car-colors > div {
-	background-color: var(--c);
 	width:  0.6rem;
 	height: 0.9rem;
 }
