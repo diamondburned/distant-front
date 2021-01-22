@@ -4,9 +4,16 @@
 {{ template "css" . }}
 {{ template "header" . }}
 
+{{ template "index-body" . }}
+
+<script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
+<script src="/static/refresh-index.js"></script>
+
+{{ define "index-body" }}
+
 {{ $distanceHost := .DistanceURL.Hostname }}
 {{ with .Observer.State }}
-<div class="container grid-lg" id="main">
+<div class="container grid-lg refresh-me" id="index">
 	<div class="columns">
 		<div class="column col-8 col-xs-12">
 			{{ with .Summary }}
@@ -53,11 +60,13 @@
 						</div>
 						<div class="player-car">
 							<span>{{ .Car.Name }}</span>
+							{{ if (le (len .Car.Colors) 3) }}
 							<div class="car-colors">
 								{{ range (slice .Car.Colors 0 3) }}
 								<div style="--c: {{rgbaHex .}}"></div>
 								{{ end }}
 							</div>
+							{{ end }}
 						</div>
 					</div>
 					{{ else }}
@@ -71,7 +80,7 @@
 					<div class="card-title h5">Chat</div>
 				</div>
 				<div class="card-body">
-					{{ range (.LatestMessages 6) }}
+					{{ range (latestMessages .ChatLog 6) }}
 					<div class="tile message">
 						<div class="tile-content">{{ markup .Chat }}</div>
 					</div>
@@ -119,5 +128,4 @@
 </div>
 {{ end }}
 
-<script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
-<script src="/static/refresh-index.js"></script>
+{{ end }}

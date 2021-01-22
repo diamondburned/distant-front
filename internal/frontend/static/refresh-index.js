@@ -1,4 +1,4 @@
-const mainSelector = document.getElementById("main");
+const mainSelector = document.querySelector(".refresh-me");
 const main = new Reef(mainSelector, {
   data: "",
   template: (data) => data,
@@ -24,8 +24,8 @@ async function update() {
   loading.render();
 
   try {
-    const resp = await fetch("");
-    main.data = resp.text();
+    const resp = await fetch("body");
+    main.data = await resp.text();
     main.render();
 
     loading.data = "waiting";

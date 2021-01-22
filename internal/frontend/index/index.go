@@ -14,6 +14,7 @@ var index = frontend.Templater.Register("index", "index/index.html")
 
 func init() {
 	frontend.Templater.Func("sortPlayers", sortPlayers)
+	frontend.Templater.Func("latestMessages", latestMessages)
 }
 
 func sortPlayers(players []distance.Player) []distance.Player {
@@ -40,6 +41,21 @@ func sortPlayers(players []distance.Player) []distance.Player {
 	return players
 }
 
+func latestMessages(msgs []distance.ChatMessage, max int) []distance.ChatMessage {
+	var latest = make([]distance.ChatMessage, 0, max)
+
+	for i := len(msgs) - 1; i >= 0 && len(latest) < max; i-- {
+		switch msg := msgs[i]; msg.Description {
+		case "AutoServer:Tip":
+			continue
+		default:
+			latest = append(latest, msg)
+		}
+	}
+
+	return latest
+}
+
 func Mount(rs frontend.RenderState) http.Handler {
 	// force preload template for early error catching
 	frontend.Templater.Preload()
@@ -48,6 +64,7 @@ func Mount(rs frontend.RenderState) http.Handler {
 	r.Use(frontend.InjectRenderState(rs))
 
 	r.Mount("/chat", chat.Mount())
+	r.Get("/body", renderBody)
 	r.Get("/", renderIndex)
 
 	return r
@@ -55,4 +72,8 @@ func Mount(rs frontend.RenderState) http.Handler {
 
 func renderIndex(w http.ResponseWriter, r *http.Request) {
 	frontend.ExecuteTemplate(w, r, index)
+}
+
+func renderBody(w http.ResponseWriter, r *http.Request) {
+	frontend.ExecuteNamedTemplate(w, r, "index-body")
 }

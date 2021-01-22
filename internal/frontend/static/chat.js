@@ -1,7 +1,10 @@
 const chatMessages = document.querySelector("#chat-box > .chat-messages");
 
 function localizeTimeInNode(node) {
-  node.querySelector("time").forEach((time) => {
+  // Exit if the current node is not an Element.
+  if (!node.querySelectorAll) return;
+
+  node.querySelectorAll("time").forEach((time) => {
     try {
       const date = new Date(time.getAttribute("datetime"));
       time.innerText = date.toLocaleTimeString();
@@ -14,9 +17,9 @@ function localizeTimeInNode(node) {
 
 // Localize new nodes.
 const timestamper = new MutationObserver((mutations) => {
-  mutations.addedNodes.forEach((node) => localizeTimeInNode);
+  mutations.addedNodes.forEach(localizeTimeInNode);
 });
 timestamper.observe(chatMessages, { childList: true });
 
 // Localize all existing nodes.
-chatMessages.childNodes.forEach((node) => localizeTimeInNode);
+chatMessages.childNodes.forEach(localizeTimeInNode);

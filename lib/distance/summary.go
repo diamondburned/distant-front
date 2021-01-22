@@ -16,15 +16,6 @@ type Summary struct {
 	VoteCommands VoteCommands
 }
 
-// LatestMessages returns the latest messages with a maximum.
-func (s Summary) LatestMessages(max int) []ChatMessage {
-	start := len(s.ChatLog) - max
-	if start < 0 {
-		start = 0
-	}
-	return s.ChatLog[start:]
-}
-
 // Server describes the server in Summary.
 type Server struct {
 	CurrentLevelID               int64 `json:"CurrentLevelId"`

@@ -165,7 +165,13 @@ div#chat-box div.chat-messages {
 	flex-direction: column-reverse;
 }
 
+div.chat-message {
+	display: grid;
+	grid-template-columns: 5em 1fr;
+}
+
 div.chat-message small.timestamp {
 	opacity: 0.75;
-	margin-right: 0.25rem;
+	text-align: right;
+	paddig-right: 0.4em;
 }

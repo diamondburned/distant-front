@@ -77,6 +77,13 @@ func ExecuteTemplate(w http.ResponseWriter, r *http.Request, sub *tmplutil.Subte
 	}
 }
 
+// ExecuteNamedTemplate executes the named template with the RenderState.
+func ExecuteNamedTemplate(w http.ResponseWriter, r *http.Request, name string) {
+	if err := Templater.Execute(w, name, GetRenderState(r.Context())); err != nil {
+		log.Println("Error rendering:", err)
+	}
+}
+
 // MountStatic mounts the static route.
 func MountStatic() http.Handler {
 	d, err := parcello.Manager.Dir("static/")
