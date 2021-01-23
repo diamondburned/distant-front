@@ -1,11 +1,11 @@
-document.querySelectorAll("a[href='/chat']").forEach((a) => {
-  a.href = "#";
-  a.addEventListener("click", (ev) =>
-	  a.href = "#";
-	  ev.preventDefault();
-    window.open("/chat", "popup", "width=450, height=320")
-  );
-});
+function changeChatPopup() {
+  document.querySelectorAll("a[href='/chat']").forEach((a) => {
+    a.href = "#";
+    a.addEventListener("click", () => {
+      window.open("/chat", "popup", "width=450, height=320");
+    });
+  });
+}
 
 const mainSelector = document.querySelector(".refresh-me");
 const main = new Reef(mainSelector, {
@@ -36,6 +36,7 @@ async function update() {
     const resp = await fetch("body");
     main.data = await resp.text();
     main.render();
+    changeChatPopup();
 
     loading.data = "waiting";
   } catch (err) {
@@ -47,3 +48,4 @@ async function update() {
 
 setInterval(update, 3500);
 loading.render();
+changeChatPopup();
