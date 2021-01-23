@@ -55,9 +55,45 @@ div.playlist-entry div.tile-content {
 	justify-content: space-between;
 }
 
-#chat-iframe {
+div#chat > a {
+	color: inherit;
+	text-decoration: inherit;
+}
+
+div#chat > a,
+div#chat > a > div.under {
+	position: relative;
+}
+
+div#chat > a > div.under {
+	transition: linear 100ms filter;
+}
+
+div#chat > a > div.popup-overlay {
+	position: absolute;
 	width:  100%;
-	height: 200px;
+	height: 100%;
+	top:  0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.02);
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	opacity: 0;
+	transition: linear 100ms opacity;
+}
+div#chat > a > div.popup-overlay > i {
+	margin-bottom: 0.4rem;
+}
+
+div#chat > a:hover > div.under {
+	filter: blur(2px);
+}
+div#chat > a:hover > div.popup-overlay {
+	opacity: 0.9;
 }
 
 div.messages {
@@ -123,7 +159,7 @@ div.refresh-bar div.refresh-inner {
 }
 
 div.refresh-bar.waiting div.refresh-inner {
-	animation: expand 5s;
+	animation: expand 3500ms;
 	animation-timing-function: linear;
 	animation-iteration-count: 1;
 
@@ -163,20 +199,43 @@ div#chat-box {
 
 div#chat-box div.chat-messages {
 	flex: 1;
-	padding: 0 0.4rem;
 	overflow: scroll;
+	padding-right: 0.2rem;
 
 	display: flex;
 	flex-direction: column-reverse;
 }
 
-div.chat-message {
+div#chat-box div.chat-message {
 	display: grid;
-	grid-template-columns: 5em 1fr;
+	grid-template-columns: 3em 1fr;
 }
 
-div.chat-message small.timestamp {
+div#chat-box div.chat-message small.timestamp {
 	opacity: 0.75;
 	text-align: right;
 	paddig-right: 0.4em;
+}
+
+div#chat-box form.chat-send {
+	display: flex;
+}
+
+div#chat-box form.chat-send > * {
+	border: none;
+	border-radius: 4px;
+	background-color: rgba(0, 0, 0, 0.05);
+
+	margin:  0.2em;
+	padding: 0.2em 0.4em;
+}
+
+div#chat-box form.chat-send > input {
+	flex: 1;
+	margin-right: 0;
+}
+
+div#chat-box form.chat-send > button {
+	color: white;
+	background-color: #807fe2;
 }

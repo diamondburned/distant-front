@@ -24,7 +24,7 @@ func Mount() http.Handler {
 	r := chi.NewRouter()
 	r.Use(noSniff)
 	r.Get("/", render)
-	r.Get("/poll/{afterID}", renderAfter)
+	r.Get("/listen/{afterID}", listen)
 	return r
 }
 
@@ -39,7 +39,7 @@ func render(w http.ResponseWriter, r *http.Request) {
 	frontend.ExecuteTemplate(w, r, chat)
 }
 
-func renderAfter(w http.ResponseWriter, r *http.Request) {
+func listen(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "afterID")
 	rs := frontend.GetRenderState(r.Context())
 
@@ -70,8 +70,6 @@ func renderAfter(w http.ResponseWriter, r *http.Request) {
 			// keep waiting. Else, immediately update the latest ID.
 			if last := ev.Summary.ChatLog[len(ev.Summary.ChatLog)-1]; last.GUID == id {
 				continue
-			} else {
-				id = last.GUID
 			}
 
 			// Find the index to send.
@@ -82,6 +80,9 @@ func renderAfter(w http.ResponseWriter, r *http.Request) {
 				// don't need to worry about properly handling HTTP flushes.
 				w.Write([]byte{0})
 			}
+
+			// Update the latest ID.
+			id = ev.Summary.ChatLog[len(ev.Summary.ChatLog)-1].GUID
 
 			// Optionally flush the events over.
 			if canFlush {

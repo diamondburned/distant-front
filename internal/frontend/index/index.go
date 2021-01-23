@@ -6,6 +6,7 @@ import (
 
 	"github.com/diamondburned/distant-front/internal/frontend"
 	"github.com/diamondburned/distant-front/internal/frontend/index/chat"
+	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
 	"github.com/go-chi/chi"
 )
@@ -70,8 +71,12 @@ func Mount(rs frontend.RenderState) http.Handler {
 	r.Use(frontend.InjectRenderState(rs))
 
 	r.Mount("/chat", chat.Mount())
-	r.Get("/body", renderBody)
-	r.Get("/", renderIndex)
+
+	r.Group(func(r chi.Router) {
+		r.Use(tmplutil.AlwaysFlush)
+		r.Get("/body", renderBody)
+		r.Get("/", renderIndex)
+	})
 
 	return r
 }

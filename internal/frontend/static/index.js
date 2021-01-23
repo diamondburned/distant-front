@@ -1,3 +1,12 @@
+document.querySelectorAll("a[href='/chat']").forEach((a) => {
+  a.href = "#";
+  a.addEventListener("click", (ev) =>
+	  a.href = "#";
+	  ev.preventDefault();
+    window.open("/chat", "popup", "width=450, height=320")
+  );
+});
+
 const mainSelector = document.querySelector(".refresh-me");
 const main = new Reef(mainSelector, {
   data: "",
@@ -36,5 +45,5 @@ async function update() {
   loading.render();
 }
 
-setInterval(update, 5000);
+setInterval(update, 3500);
 loading.render();

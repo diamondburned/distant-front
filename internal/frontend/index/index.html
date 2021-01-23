@@ -9,7 +9,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/gh/cferdinandi/reef@4/dist/reef.min.js"></script>
-<script src="/static/refresh-index.js"></script>
+<script src="/static/index.js"></script>
 
 {{ define "index-body" }}
 
@@ -74,18 +74,26 @@
 		</div>
 
 		<div id="chat" class="card">
-			<div class="card-header">
-				<div class="card-title h5">Chat</div>
-			</div>
-			<div class="card-body">
-				{{ range (latestMessages .ChatLog 6) }}
-				<div class="tile message">
-					<div class="tile-content">{{ markup .Chat }}</div>
+			<a href="/chat">
+				<div class="popup-overlay">
+					<i class="icon icon-4x icon-share"></i>
+					<span>Open Popup</span>
 				</div>
-				{{ else }}
-				{{ template "empty-card" "Empty" }}
-				{{ end }}
-			</div>
+				<div class="under">
+					<div class="card-header">
+						<div class="card-title h5">Chat</div>
+					</div>
+					<div class="card-body">
+						{{ range (latestMessages .ChatLog 6) }}
+						<div class="tile message">
+							<div class="tile-content">{{ markup .Chat }}</div>
+						</div>
+						{{ else }}
+						{{ template "empty-card" "Empty" }}
+						{{ end }}
+					</div>
+				</div>
+			</a>
 		</div>
 		{{ end }}
 	</div>

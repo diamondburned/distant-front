@@ -19,8 +19,12 @@
 		{{ template "chat-message" . }}
 		{{ end }}
 	</div>
-	<div class="chat-send">
-	</div>
+	<form class="chat-send" action="/chat" method="post">
+		<input type="text" placeholder="Type a message...">
+		<button type="submit">
+			<i aria-label="Send" class="icon icon-message"></i>
+		</button>
+	</form>
 </div>
 {{ end }}
 

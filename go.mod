@@ -8,6 +8,7 @@ require (
 	github.com/cskr/pubsub v1.0.2 // indirect
 	github.com/dgraph-io/badger v1.6.2
 	github.com/go-chi/chi v1.5.1
+	github.com/google/uuid v1.2.0
 	github.com/hexops/autogold v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/lucasb-eyer/go-colorful v1.0.3
