@@ -1,12 +1,13 @@
 package distance
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"net/http/cookiejar"
 	"net/url"
 	"sync"
 	"time"
@@ -16,24 +17,26 @@ import (
 
 // Client is a Distance Server client with a custom endpoint.
 type Client struct {
-	Client   http.Client
-	endpoint url.URL
+	Client    http.Client
+	endpoint  url.URL
+	privToken string
 
 	// internal state
 	ctx context.Context
 }
 
 // NewClient creates a new Distance Server client.
-func NewClient(endpoint string) (*Client, error) {
+func NewClient(endpoint, privToken string) (*Client, error) {
 	url, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid endpoint URL")
 	}
 
 	return &Client{
-		Client:   http.Client{Timeout: 10 * time.Second},
-		endpoint: *url,
-		ctx:      context.Background(),
+		Client:    http.Client{Timeout: 10 * time.Second},
+		endpoint:  *url,
+		privToken: privToken,
+		ctx:       context.Background(),
 	}, nil
 }
 
@@ -45,47 +48,61 @@ func (c *Client) WithContext(ctx context.Context) *Client {
 	return &cpy
 }
 
-// WithSession creates a copy of the Client with the given context and session
-// for individual authentication.
-func (c *Client) WithSession(ctx context.Context, session string) *Client {
-	cookies, _ := cookiejar.New(nil)
-	cookies.SetCookies(&c.endpoint, []*http.Cookie{{
-		Path:   "/",
-		Name:   "DistanceSession",
-		Value:  session,
-		Domain: c.endpoint.Hostname(),
-	}})
-
-	c = c.WithContext(ctx)
-	c.Client.Jar = cookies
-
-	return c
-}
-
 func (c *Client) getJSON(u url.URL, dst interface{}) error {
-	u.Scheme = c.endpoint.Scheme
-	u.Host = c.endpoint.Host
-
-	rq, err := http.NewRequestWithContext(c.ctx, "GET", u.String(), nil)
+	r, err := c.doJSON("GET", u, dst, nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to create request")
+		return err
 	}
+	defer r.Body.Close()
 
-	resp, err := c.Client.Do(rq)
-	if err != nil {
-		return errors.Wrap(err, "failed to do request")
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("unexpected status code %d", resp.StatusCode)
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(dst); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(dst); err != nil {
 		return errors.Wrap(err, "failed to decode JSON body")
 	}
 
 	return nil
+}
+
+func (c *Client) doJSON(
+	method string, u url.URL, in interface{}, h http.Header) (*http.Response, error) {
+
+	u.Scheme = c.endpoint.Scheme
+	u.Host = c.endpoint.Host
+
+	var body io.Reader
+	if in != nil {
+		b, err := json.Marshal(in)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal body")
+		}
+		body = bytes.NewReader(b)
+	}
+
+	rq, err := http.NewRequestWithContext(c.ctx, method, u.String(), body)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create request")
+	}
+
+	if h != nil {
+		rq.Header = h
+	}
+
+	// This is safe to do just because we're not passing raw data to the
+	// frontend.
+	if c.privToken != "" {
+		rq.Header.Set("Authorization", "Bearer "+c.privToken)
+	}
+
+	resp, err := c.Client.Do(rq)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to do request")
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		resp.Body.Close()
+		return nil, fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
+
+	return resp, nil
 }
 
 // Observer observes the server for changes periodically.

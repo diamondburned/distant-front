@@ -19,12 +19,18 @@
 		{{ template "chat-message" . }}
 		{{ end }}
 	</div>
+	{{ if $.IsLinked }}
 	<form class="chat-send" action="/chat" method="post">
-		<input type="text" placeholder="Type a message...">
-		<button type="submit">
+		<input type="text" placeholder="Type a message..." disabled>
+		<button type="submit" disabled>
 			<i aria-label="Send" class="icon icon-message"></i>
 		</button>
 	</form>
+	{{ else }}
+	<a class="auth" href="/chat/authenticate">
+		<i class="icon icon-people"></i> Authenticate
+	</a>
+	{{ end }}
 </div>
 {{ end }}
 

@@ -25,6 +25,19 @@ timestamper.observe(chatMessages, { childList: true });
 // Localize all existing nodes.
 chatMessages.childNodes.forEach(localizeTimeInNode);
 
+function hasCookies(...cookies) {
+  var found = 0;
+
+  return document.cookie.split("; ").some((it) => {
+    const thisName = it.trim();
+
+    const ok = cookies.some((name) => thisName.startsWith(`${name}=`));
+    if (ok) found++;
+
+    return found === cookies.length;
+  });
+}
+
 // LastSelector is the selector for the last message. Since we're doing
 // column-reverse, the last message is the first one in the DOM tree.
 const LastSelector = "div.chat-messages > div.chat-message:first-child";

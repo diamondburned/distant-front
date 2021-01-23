@@ -67,6 +67,7 @@ func GetRenderState(ctx context.Context) RenderState {
 	if !ok {
 		panic("no render state in context")
 	}
+	renderState.Client = renderState.Client.WithContext(ctx)
 	return renderState
 }
 

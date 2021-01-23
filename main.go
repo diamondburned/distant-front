@@ -22,15 +22,22 @@ func main() {
 		log.Fatalln("failed to load .env:", err)
 	}
 
+	var (
+		endpoint   = os.Getenv("DISTANCE_ENDPOINT")
+		privToken  = os.Getenv("DISTANCE_PRIVTOKEN")
+		siteName   = os.Getenv("DISTANCE_NAME")
+		listenAddr = os.Getenv("DISTANCE_LISTEN")
+	)
+
 	// Make all colors darker.
 	markup.ColorModifier = markup.Darken(+0.8, -0.2)
 
-	distanceURL, err := url.Parse(os.Getenv("DISTANCE_ENDPOINT"))
+	distanceURL, err := url.Parse(endpoint)
 	if err != nil {
 		log.Fatalln("invalid $DISTANCE_ENDPOINT:", err)
 	}
 
-	c, err := distance.NewClient(distanceURL.String())
+	c, err := distance.NewClient(distanceURL.String(), privToken)
 	if err != nil {
 		log.Fatalln("failed to crete Distance client:", err)
 	}
@@ -45,7 +52,7 @@ func main() {
 	rs := frontend.RenderState{
 		Client:      c,
 		Observer:    distance.NewObserver(c, time.Second),
-		SiteName:    os.Getenv("DISTANCE_NAME"),
+		SiteName:    siteName,
 		DistanceURL: distanceURL,
 	}
 
@@ -54,11 +61,10 @@ func main() {
 	r.Mount("/static", frontend.MountStatic())
 	r.Mount("/", index.Mount(rs))
 
-	var addr = os.Getenv("DISTANCE_LISTEN")
-	if addr == "" {
-		addr = ":8081"
+	if listenAddr == "" {
+		listenAddr = ":8081"
 	}
 
-	log.Println("Listen and serve at", addr)
-	log.Fatalln(http.ListenAndServe(addr, r))
+	log.Println("Listen and serve at", listenAddr)
+	log.Fatalln(http.ListenAndServe(listenAddr, r))
 }

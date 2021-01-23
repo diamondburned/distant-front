@@ -2,6 +2,7 @@ package chat
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -25,6 +26,12 @@ func Mount() http.Handler {
 	r.Use(noSniff)
 	r.Get("/", render)
 	r.Get("/listen/{afterID}", listen)
+
+	r.Route("/authenticate", func(r chi.Router) {
+		r.Get("/", renderAuth)
+		r.Post("/", postAuth)
+	})
+
 	return r
 }
 
@@ -35,8 +42,23 @@ func noSniff(next http.Handler) http.Handler {
 	})
 }
 
+type renderData struct {
+	frontend.RenderState
+	IsLinked bool
+}
+
 func render(w http.ResponseWriter, r *http.Request) {
-	frontend.ExecuteTemplate(w, r, chat)
+	data := renderData{
+		RenderState: frontend.GetRenderState(r.Context()),
+		IsLinked: getCookies(r, map[string]string{
+			"DistanceSession": "",
+			"PrivateToken":    "",
+		}),
+	}
+
+	if err := chat.Execute(w, data); err != nil {
+		log.Println("Error rendering:", err)
+	}
 }
 
 func listen(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +90,7 @@ func listen(w http.ResponseWriter, r *http.Request) {
 			}
 			// If the last message is still the currently waiting message, then
 			// keep waiting. Else, immediately update the latest ID.
-			if last := ev.Summary.ChatLog[len(ev.Summary.ChatLog)-1]; last.GUID == id {
+			if ev.Summary.ChatLog[len(ev.Summary.ChatLog)-1].GUID == id {
 				continue
 			}
 

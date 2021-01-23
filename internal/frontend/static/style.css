@@ -217,10 +217,13 @@ div#chat-box div.chat-message small.timestamp {
 	paddig-right: 0.4em;
 }
 
-div#chat-box form.chat-send {
-	display: flex;
+div#chat-box a.auth {
+	width: 100%;
+	text-align: center;
+	text-decoration: none;
 }
 
+div#chat-box a.auth,
 div#chat-box form.chat-send > * {
 	border: none;
 	border-radius: 4px;
@@ -228,6 +231,10 @@ div#chat-box form.chat-send > * {
 
 	margin:  0.2em;
 	padding: 0.2em 0.4em;
+}
+
+div#chat-box form.chat-send {
+	display: flex;
 }
 
 div#chat-box form.chat-send > input {
@@ -238,4 +245,11 @@ div#chat-box form.chat-send > input {
 div#chat-box form.chat-send > button {
 	color: white;
 	background-color: #807fe2;
+}
+
+div#authenticate-page {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
