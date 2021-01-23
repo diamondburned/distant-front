@@ -132,6 +132,7 @@ type Car struct {
 	Name            string       `json:"CarName"`
 	Points          int
 	Finished        bool
+	FinishType      FinishType
 	FinishData      int
 	Spectator       bool
 	Alive           bool
@@ -140,9 +141,22 @@ type Car struct {
 	Rotation        []float32
 	Velocity        []float32
 	AngularVelocity []float32
-
-	// TODO: FinishType
 }
+
+// IsFinished returns true if the car finished normally.
+func (c Car) IsFinished() bool { return c.Finished && c.FinishType == NormalFinish }
+
+type FinishType string
+
+const (
+	NoneFinish          FinishType = "None"
+	NormalFinish        FinishType = "Normal"
+	DNFFinish           FinishType = "DNF"
+	SpectateFinish      FinishType = "Spectate"
+	JoinedLateFinish    FinishType = "JoinedLate"
+	ViewingReplayFinish FinishType = "ViewingReplay"
+	LeavingLevelFinish  FinishType = "LeavingLevel"
+)
 
 // VoteCommands describes the vote commands in Summary.
 type VoteCommands struct {

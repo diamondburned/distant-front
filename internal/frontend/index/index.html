@@ -48,7 +48,7 @@
 				<div class="player tile tile-centered">
 					<div class="player-info">
 						<span>{{ .Name }}</span>
-						{{      if .Car.Finished }}
+						{{      if .Car.IsFinished }}
 						<span class="flag" title="Finished">🏁</span>
 						{{ else if .Car.Spectator }}
 						<span class="flag" title="Spectating">🔭</span>

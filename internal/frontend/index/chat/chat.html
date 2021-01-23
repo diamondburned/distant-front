@@ -4,7 +4,7 @@
 {{ template "css" . }}
 
 {{ define "chat-message" }}
-<div class="tile chat-message">
+<div class="tile chat-message" id="{{ .GUID }}">
 	<small class="tile-subtitle timestamp">
 		<time datetime="{{ .Time.UTC.Format "2006-01-02T15:04:05Z" }}"></time>
 	</small>

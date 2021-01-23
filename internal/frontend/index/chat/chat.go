@@ -22,18 +22,18 @@ func init() {
 // Mount mounts the chat routes.
 func Mount() http.Handler {
 	r := chi.NewRouter()
+	r.Use(noSniff)
 	r.Get("/", render)
-	r.Get("/after/{afterID}", renderAfter)
+	r.Get("/poll/{afterID}", renderAfter)
 	return r
 }
 
-const (
-	// MinWait is the minimum time to wait before yielding the request back.
-	// This is done to prevent overloading the server.
-	MinWait = 500 * time.Millisecond
-	// MaxWait is the maximum wait time before the request returns.
-	MaxWait = 30 * time.Second
-)
+func noSniff(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		next.ServeHTTP(w, r)
+	})
+}
 
 func render(w http.ResponseWriter, r *http.Request) {
 	frontend.ExecuteTemplate(w, r, chat)
@@ -43,8 +43,7 @@ func renderAfter(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "afterID")
 	rs := frontend.GetRenderState(r.Context())
 
-	timeout := time.NewTimer(MaxWait)
-	defer timeout.Stop()
+	flusher, canFlush := w.(http.Flusher)
 
 	evCh, cancel := rs.Observer.Subscribe()
 	defer cancel()
@@ -53,9 +52,6 @@ func renderAfter(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-r.Context().Done():
 			// Request cancelled; bail with OK.
-			return
-		case <-timeout.C:
-			// Timeout; bail with OK.
 			return
 
 		case ev, ok := <-evCh:
@@ -71,18 +67,26 @@ func renderAfter(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			// If the last message is still the currently waiting message, then
-			// keep waiting.
-			if ev.Summary.ChatLog[len(ev.Summary.ChatLog)-1].GUID == id {
+			// keep waiting. Else, immediately update the latest ID.
+			if last := ev.Summary.ChatLog[len(ev.Summary.ChatLog)-1]; last.GUID == id {
 				continue
+			} else {
+				id = last.GUID
 			}
 
 			// Find the index to send.
 			ix := lookBackwards(ev.Summary.ChatLog, id)
 			for i := len(ev.Summary.ChatLog) - 1; i != ix; i-- {
 				frontend.Templater.Execute(w, "chat-message", ev.Summary.ChatLog[i])
+				// Delimit using a NULL byte. By using a proper delimiter, we
+				// don't need to worry about properly handling HTTP flushes.
+				w.Write([]byte{0})
 			}
 
-			return
+			// Optionally flush the events over.
+			if canFlush {
+				flusher.Flush()
+			}
 		}
 	}
 }
