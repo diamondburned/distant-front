@@ -224,8 +224,8 @@ a#chat-auth {
 }
 
 a#chat-auth,
-form#chat-send .btn,
-form#chat-send input {
+div.message-composer form .btn,
+div.message-composer form input {
 	border: none;
 	border-radius: 4px;
 
@@ -233,31 +233,39 @@ form#chat-send input {
 	padding: 0.2em 0.4em;
 }
 
-form#chat-send {
+div.message-composer {
+	display: flex;
+}
+
+div.message-composer form#chat-send {
+	flex: 1;
+}
+
+div.message-composer form {
 	display: flex;
 	margin-bottom: 0.4rem;
 }
 
-form#chat-send .btn {
+div.message-composer form .btn {
 	height: inherit;
 }
 
-form#chat-send input {
+div.message-composer form input {
 	flex: 1;
 	background-color: rgba(0, 0, 0, 0.05);
 }
 
-form#chat-send a.btn,
-form#chat-send button {
+div.message-composer form a.btn,
+div.message-composer form button {
 	color: white;
 }
 
-form#chat-send div.popover:hover div.popover-container,
-form#chat-send div.popover:focus + div.popover-container {
+div.message-composer form div.popover:hover div.popover-container,
+div.message-composer form div.popover:focus + div.popover-container {
 	transform: translate(-1.1rem, -80%);
 }
 
-form#chat-send div.popover-container div.card-body {
+div.message-composer form div.popover-container div.card-body {
 	display: flex;
 	flex-direction: column;
 }

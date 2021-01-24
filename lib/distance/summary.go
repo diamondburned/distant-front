@@ -16,6 +16,17 @@ type Summary struct {
 	VoteCommands VoteCommands
 }
 
+// FindPlayer finds the player by the given Unity Player GUID string. Nil is
+// returned if no players are found.
+func (s Summary) FindPlayer(guid string) *Player {
+	for i, player := range s.Players {
+		if player.UnityPlayerGUID == guid {
+			return &s.Players[i]
+		}
+	}
+	return nil
+}
+
 // Server describes the server in Summary.
 type Server struct {
 	CurrentLevelID               int64 `json:"CurrentLevelId"`

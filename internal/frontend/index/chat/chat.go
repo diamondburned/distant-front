@@ -27,9 +27,15 @@ func Mount() http.Handler {
 	r.Get("/", render)
 	r.Post("/", sendMessage)
 
+	r.Post("/unlink", unlinkSession)
 	r.Get("/listen/{afterID}", listen)
 
 	return r
+}
+
+func unlinkSession(w http.ResponseWriter, r *http.Request) {
+	link.ClearDistanceSession(w)
+	http.Redirect(w, r, "/chat", http.StatusFound)
 }
 
 func sendMessage(w http.ResponseWriter, r *http.Request) {
@@ -68,11 +74,32 @@ func render(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+const (
+	// MagicExpire is the magical expired HTML string.
+	MagicExpire = "<!-- SESSION EXPIRED -->"
+	// MagicHalted is written when the server is halted.
+	MagicHalted = "<!-- SERVER HALTED -->"
+)
+
 func listen(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
+
 	id := chi.URLParam(r, "afterID")
 	rs := frontend.GetRenderState(r.Context())
+
+	// Try and fetch the player's GUID so we can keep track of it.
+	var playerGUID string
+
+	if session := link.GetDistanceSession(r); session != "" {
+		g, err := rs.Client.PlayerGUID(session)
+		if err != nil {
+			w.WriteHeader(401)
+			io.WriteString(w, "invalid session token")
+			return
+		}
+		playerGUID = g
+	}
 
 	flusher, canFlush := w.(http.Flusher)
 
@@ -85,13 +112,16 @@ func listen(w http.ResponseWriter, r *http.Request) {
 			// Request cancelled; bail with OK.
 			return
 
-		case ev, ok := <-evCh:
+		case _, ok := <-evCh:
 			if !ok {
 				// Observer is halted; bail with error.
-				w.WriteHeader(500)
-				io.WriteString(w, "Server halted.")
+				io.WriteString(w, MagicHalted)
 				return
 			}
+
+			// Get the latest event manually in case our event loop is lagged
+			// behind.
+			ev := rs.Observer.State()
 
 			// If there are no messages for some reason, then keep waiting.
 			if len(ev.Summary.ChatLog) == 0 {
@@ -118,6 +148,15 @@ func listen(w http.ResponseWriter, r *http.Request) {
 			// Optionally flush the events over.
 			if canFlush {
 				flusher.Flush()
+			}
+
+			// Confirm that the player still has the same GUID. Drop as soon as
+			// that is false.
+			if playerGUID != "" && ev.Summary.FindPlayer(playerGUID) == nil {
+				// Write a special constant to trigger the frontend and bail.
+				io.WriteString(w, MagicExpire)
+				w.Write([]byte{0})
+				return
 			}
 		}
 	}

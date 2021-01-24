@@ -23,6 +23,11 @@ func GetDistanceSession(r *http.Request) string {
 	return cookie.Value
 }
 
+// ClearDistanceSession clears the DistanceSession cookie.
+func ClearDistanceSession(w http.ResponseWriter) {
+	writeDistanceSession(w, "")
+}
+
 func Mount() http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", renderAuth)

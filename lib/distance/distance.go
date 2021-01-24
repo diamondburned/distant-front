@@ -137,6 +137,7 @@ type Observer struct {
 type ObservedState struct {
 	Summary       *Summary
 	PlaylistState *PlaylistState
+	Links         *Links
 	LastRenew     time.Time
 }
 
@@ -180,9 +181,8 @@ func NewObserver(c *Client, dura time.Duration) *Observer {
 }
 
 func (obs *Observer) refetch(tick time.Time) {
-	obs.waitg.Add(1)
-
 	var playlist *PlaylistState
+	obs.waitg.Add(1)
 	go func() {
 		p, err := obs.client.AllPlaylist()
 		if err != nil {
@@ -192,9 +192,24 @@ func (obs *Observer) refetch(tick time.Time) {
 		obs.waitg.Done()
 	}()
 
-	summary, err := obs.client.Summary()
-	if err != nil {
-		obs.OnError(errors.Wrap(err, "failed to get summary"))
+	var summary *Summary
+	obs.waitg.Add(1)
+	go func() {
+		s, err := obs.client.Summary()
+		if err != nil {
+			obs.OnError(errors.Wrap(err, "failed to get summary"))
+		}
+		summary = s
+		obs.waitg.Done()
+	}()
+
+	var links *Links
+	if obs.client.privToken != "" {
+		l, err := obs.client.Links()
+		if err != nil {
+			obs.OnError(errors.Wrap(err, "failed to get all playlists"))
+		}
+		links = l
 	}
 
 	obs.waitg.Wait()
@@ -202,6 +217,7 @@ func (obs *Observer) refetch(tick time.Time) {
 	state := ObservedState{
 		LastRenew:     tick,
 		PlaylistState: playlist,
+		Links:         links,
 		Summary:       summary,
 	}
 

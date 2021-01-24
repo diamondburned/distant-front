@@ -61,6 +61,21 @@ func (c *Client) Links() (*Links, error) {
 	return &links, nil
 }
 
+// PlayerGUID returns the player's GUID from the session string.
+func (c *Client) PlayerGUID(session string) (string, error) {
+	links, err := c.Links()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get links")
+	}
+
+	guid, ok := links.Links[session]
+	if !ok {
+		return "", errors.New("session not found")
+	}
+
+	return guid, nil
+}
+
 // ErrLinkCodeNotFound is returned when the link code cannot be found. It is
 // returned by LinkSession.
 var ErrLinkCodeNotFound = errors.New("link code not found")

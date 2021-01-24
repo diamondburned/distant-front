@@ -42,25 +42,28 @@ function hasCookies(...cookies) {
 // column-reverse, the last message is the first one in the DOM tree.
 const LastSelector = "div.chat-messages > div.chat-message:first-child";
 
+// MagicExpire is the magical expired HTML string; it is copy-pasted from the Go
+// implementation.
+const MagicExpire = "<!-- SESSION EXPIRED -->";
+
 // listen opens a persistent HTTP connection to receive null-delimited HTML
 // chunks.
 async function listen() {
   const last = document.querySelector(LastSelector);
-  const resp = await fetch(`/chat/listen/${last ? last.id : ""}`);
   const utf8 = new TextDecoder("utf-8");
+
+  const resp = await fetch(`/chat/listen/${last ? last.id : ""}`);
+  if (!resp.ok) throw `unexpected ${resp.status}, reason ${await resp.text()}`;
 
   const reader = resp.body.getReader();
   var textBuf = [];
 
-  let packet = {};
-
   while (true) {
     const packet = await reader.read();
-    if (!packet || packet.done) throw "stream closed";
+    if (!packet || packet.done) throw `unexpected close: ${textBuf.join("")}`;
     if (!packet.value) continue; // empty read; not an error until EOF.
 
     let text = utf8.decode(packet.value);
-    console.log("received", text);
 
     // Iterate until we're out of delimiters.
     while (true) {
@@ -73,15 +76,22 @@ async function listen() {
 
       // Push the complete segment and join.
       textBuf.push(text.slice(0, delim));
-      const html = textBuf.join("");
+      const message = textBuf.join("");
 
       // Clear the buffer but allow space reusing and add the tail of the chunk
       // in.
       textBuf.length = 0;
       text = text.slice(delim + 1);
 
-      // Write the received HTML chunk.
-      addMessageHTML(html);
+      // Check for specially-treated messages; treat as regular HTML otherwise.
+      switch (message) {
+        case "<!-- SESSION EXPIRED -->":
+          return;
+        case "<!-- SERVER HALTED -->":
+          throw "server halted; retry.";
+        default:
+          addMessageHTML(message);
+      }
     }
   }
 }
@@ -104,16 +114,26 @@ async function sleep(ms) {
 
 // backgroundLoop is the long polling loop.
 async function backgroundLoop() {
+  const unlinkButton = document.getElementById("unlink-button");
+
   while (true) {
-    console.log("listening...");
+    const timeout = sleep(10000); // 10s promise
 
-    // Cooldown for 5 seconds minimum before each retry. Using allSettled
-    // allows us to sleep even if listen has thrown an exception.
-    const [res, _] = await Promise.allSettled([listen(), sleep(10000)]);
+    try {
+      await listen();
 
-    if (res.status === "rejected") {
-      console.error(`Listen error: ${res.reason}`);
+      // We should only unlink if we're linked in the first place. We can know
+      // this because the server will render the button if we are.
+      if (unlinkButton) {
+        unlinkButton.click();
+        return;
+      }
+    } catch (err) {
+      console.error(`Listen error: ${err}`);
     }
+
+    // Wait for the timeout before retrying.
+    await timeout;
   }
 }
 
