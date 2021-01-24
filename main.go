@@ -55,7 +55,7 @@ func main() {
 
 	rs := frontend.RenderState{
 		Client:      c,
-		Observer:    distance.NewObserver(c, time.Second),
+		Observer:    distance.NewObserver(c, 500*time.Millisecond),
 		SiteName:    siteName,
 		DistanceURL: distanceURL,
 	}
