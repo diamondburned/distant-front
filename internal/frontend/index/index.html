@@ -113,13 +113,13 @@
 				>
 					<div class="tile-icon">
 						<img
-							class="playlist-thumb" alt="Thumbnail"
+							class="playlist-thumb" alt="Thumbnail" loading="lazy"
 							src="/workshopimg/{{.WorkshopFileID}}?size=128"
 						/>
 					</div>
 					<div class="tile-content">
 						<div class="tile-title">
-							<a target="_blank" loading="lazy" href="{{ .WorkshopURL }}">
+							<a target="_blank" title="{{ .Name }}" href="{{ .WorkshopURL }}">
 								{{ .Name }}
 							</a>
 						</div>

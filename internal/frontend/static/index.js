@@ -21,7 +21,8 @@ document.querySelector("header.navbar").appendChild(loadingSelector);
 
 const loading = new Reef(loadingSelector, {
   data: "waiting",
-  template: (className) => `
+  template: (className) =>
+    `
 	<div class="refresh-bar ${className}">
 	  <div class="refresh-inner"></div>
 	</div>`,

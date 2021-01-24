@@ -24,8 +24,8 @@ func main() {
 
 	var (
 		endpoint   = os.Getenv("DISTANCE_ENDPOINT")
-		privToken  = os.Getenv("DISTANCE_PRIVTOKEN")
 		siteName   = os.Getenv("DISTANCE_NAME")
+		privToken  = os.Getenv("DISTANCE_PRIVTOKEN")
 		listenAddr = os.Getenv("DISTANCE_LISTEN")
 	)
 
@@ -37,9 +37,13 @@ func main() {
 		log.Fatalln("invalid $DISTANCE_ENDPOINT:", err)
 	}
 
-	c, err := distance.NewClient(distanceURL.String(), privToken)
+	c, err := distance.NewClient(distanceURL.String())
 	if err != nil {
 		log.Fatalln("failed to crete Distance client:", err)
+	}
+
+	if privToken != "" {
+		c.SetPrivateToken(privToken)
 	}
 
 	imgRoute, err := workshopimg.Mount(workshopimg.CacheOpts{

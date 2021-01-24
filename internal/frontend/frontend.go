@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
@@ -34,6 +37,21 @@ var Templater = tmplutil.Templater{
 				float64(rgba[2]),
 			)
 			return color.Hex()
+		},
+		"shortErr": func(err string) string {
+			parts := strings.Split(err, ": ")
+			if len(parts) == 0 {
+				return ""
+			}
+
+			part := parts[len(parts)-1]
+
+			r, sz := utf8.DecodeRuneInString(part)
+			if sz == 0 {
+				return ""
+			}
+
+			return string(unicode.ToUpper(r)) + part[sz:] + "."
 		},
 	},
 }

@@ -119,3 +119,48 @@ async function backgroundLoop() {
 
 // Start the background loop.
 backgroundLoop();
+
+const chatSend = document.querySelector("form#chat-send"),
+  chatInput = chatSend.querySelector("input[type='text']"),
+  chatButton = chatSend.querySelector("button[type='submit']");
+
+// Start binding the sending form to remove the need to reload the page.
+
+chatInput.addEventListener("keydown", async (ev) => {
+  if (ev.key === "Enter") {
+    ev.preventDefault();
+    await sendMessage();
+  }
+});
+
+chatButton.addEventListener("click", async (ev) => {
+  ev.preventDefault();
+  await sendMessage();
+});
+
+async function sendMessage() {
+  const m = chatInput.value;
+  if (!m) return;
+
+  chatButton.disabled = true;
+  chatInput.disabled = true;
+  chatInput.value = "";
+
+  try {
+    const r = await fetch(`/chat?m=${encodeURIComponent(m)}`, {
+      method: "POST",
+      redirect: "manual",
+      credentials: "same-origin",
+    });
+    // Expect a redirection on success.
+    if (r.type != "opaqueredirect") {
+      throw `unexpected ${r.status} response: ${await r.text()}`;
+    }
+  } catch (err) {
+    chatInput.value = m;
+    console.error(`failed to send message: ${err}`);
+  }
+
+  chatButton.disabled = false;
+  chatInput.disabled = false;
+}

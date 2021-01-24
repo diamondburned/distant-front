@@ -217,39 +217,67 @@ div#chat-box div.chat-message small.timestamp {
 	paddig-right: 0.4em;
 }
 
-div#chat-box a.auth {
+a#chat-auth {
 	width: 100%;
 	text-align: center;
 	text-decoration: none;
 }
 
-div#chat-box a.auth,
-div#chat-box form.chat-send > * {
+a#chat-auth,
+form#chat-send .btn,
+form#chat-send input {
 	border: none;
 	border-radius: 4px;
-	background-color: rgba(0, 0, 0, 0.05);
 
 	margin:  0.2em;
 	padding: 0.2em 0.4em;
 }
 
-div#chat-box form.chat-send {
+form#chat-send {
 	display: flex;
+	margin-bottom: 0.4rem;
 }
 
-div#chat-box form.chat-send > input {
+form#chat-send .btn {
+	height: inherit;
+}
+
+form#chat-send input {
 	flex: 1;
-	margin-right: 0;
+	background-color: rgba(0, 0, 0, 0.05);
 }
 
-div#chat-box form.chat-send > button {
+form#chat-send a.btn,
+form#chat-send button {
 	color: white;
-	background-color: #807fe2;
+}
+
+form#chat-send div.popover:hover div.popover-container,
+form#chat-send div.popover:focus + div.popover-container {
+	transform: translate(-1.1rem, -80%);
+}
+
+form#chat-send div.popover-container div.card-body {
+	display: flex;
+	flex-direction: column;
 }
 
 div#authenticate-page {
-	height: 100vh;
 	display: flex;
+	padding: 1rem;
 	flex-direction: column;
-	justify-content: center;
+}
+
+div#authenticate-page > *:not(.card) {
+	border-radius: 4px;
+	margin-bottom: 1rem;
+}
+
+div#authenticate-page form.card-body {
+	padding-top: 0;
+}
+
+div#authenticate-page div.form-group:not(:last-child) {
+	margin-top:    0.4rem;
+    margin-bottom: 0.8rem;
 }

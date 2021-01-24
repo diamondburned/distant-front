@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"sync"
 	"time"
 
@@ -26,17 +26,16 @@ type Client struct {
 }
 
 // NewClient creates a new Distance Server client.
-func NewClient(endpoint, privToken string) (*Client, error) {
+func NewClient(endpoint string) (*Client, error) {
 	url, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid endpoint URL")
 	}
 
 	return &Client{
-		Client:    http.Client{Timeout: 10 * time.Second},
-		endpoint:  *url,
-		privToken: privToken,
-		ctx:       context.Background(),
+		Client:   http.Client{Timeout: 10 * time.Second},
+		endpoint: *url,
+		ctx:      context.Background(),
 	}, nil
 }
 
@@ -46,6 +45,19 @@ func (c *Client) WithContext(ctx context.Context) *Client {
 	cpy := *c
 	cpy.ctx = ctx
 	return &cpy
+}
+
+// SetPrivateToken sets the private token to use. Endpoints that need the token
+// will automatically use it if needed.
+func (c *Client) SetPrivateToken(privToken string) {
+	c.privToken = privToken
+}
+
+// ErrStatusCode is returned if the request has an unexpected status code.
+type ErrStatusCode int
+
+func (err ErrStatusCode) Error() string {
+	return "unexpected status code " + strconv.Itoa(int(err))
 }
 
 func (c *Client) getJSON(u url.URL, dst interface{}) error {
@@ -86,8 +98,6 @@ func (c *Client) doJSON(
 		rq.Header = h
 	}
 
-	// This is safe to do just because we're not passing raw data to the
-	// frontend.
 	if c.privToken != "" {
 		rq.Header.Set("Authorization", "Bearer "+c.privToken)
 	}
@@ -99,7 +109,7 @@ func (c *Client) doJSON(
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		resp.Body.Close()
-		return nil, fmt.Errorf("unexpected status code %d", resp.StatusCode)
+		return nil, ErrStatusCode(resp.StatusCode)
 	}
 
 	return resp, nil

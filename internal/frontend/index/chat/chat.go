@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/diamondburned/distant-front/internal/frontend"
+	"github.com/diamondburned/distant-front/internal/frontend/index/link"
 	"github.com/diamondburned/distant-front/lib/distance"
 	"github.com/go-chi/chi"
 )
@@ -23,23 +24,32 @@ func init() {
 // Mount mounts the chat routes.
 func Mount() http.Handler {
 	r := chi.NewRouter()
-	r.Use(noSniff)
 	r.Get("/", render)
-	r.Get("/listen/{afterID}", listen)
+	r.Post("/", sendMessage)
 
-	r.Route("/authenticate", func(r chi.Router) {
-		r.Get("/", renderAuth)
-		r.Post("/", postAuth)
-	})
+	r.Get("/listen/{afterID}", listen)
 
 	return r
 }
 
-func noSniff(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		next.ServeHTTP(w, r)
-	})
+func sendMessage(w http.ResponseWriter, r *http.Request) {
+	session := link.GetDistanceSession(r)
+	if session == "" {
+		w.WriteHeader(401)
+		io.WriteString(w, "action not permitted: missing session")
+		return
+	}
+
+	message := r.FormValue("m")
+	rs := frontend.GetRenderState(r.Context())
+
+	if err := rs.Client.Chat(session, message); err != nil {
+		w.WriteHeader(500)
+		io.WriteString(w, "failed to send message: "+err.Error())
+		return
+	}
+
+	http.Redirect(w, r, "/chat", http.StatusFound)
 }
 
 type renderData struct {
@@ -50,10 +60,7 @@ type renderData struct {
 func render(w http.ResponseWriter, r *http.Request) {
 	data := renderData{
 		RenderState: frontend.GetRenderState(r.Context()),
-		IsLinked: getCookies(r, map[string]string{
-			"DistanceSession": "",
-			"PrivateToken":    "",
-		}),
+		IsLinked:    link.GetDistanceSession(r) != "",
 	}
 
 	if err := chat.Execute(w, data); err != nil {

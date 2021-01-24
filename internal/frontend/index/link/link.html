@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<title>Authenticate - {{ .SiteName }}</title>
+
+{{ template "css" . }}
+{{ template "header" . }}
+
+<div id="authenticate-page" class="container grid-xs">
+	{{ with .Error }}
+	<div class="popover popover-top">
+		<div class="errtoast toast toast-error">{{ shortErr . }}</div>
+		<div class="popover-container">
+			<div class="card">
+				<div class="card-body">
+					<code class="text-error" id="auth-error">{{ . }}</code>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{ end }}
+
+	{{ if .Unlinked }}
+	<div class="toast">Unlinked.</div>
+	{{ end }}
+
+	<div class="card">
+		<form method="post" class="card-body form-horizontal">
+			<div class="form-group">
+				<label class="form-label" for="player-guid">Link Code</label>
+				<input
+					class="form-input" type="text" id="link-code" required
+					name="link_code"
+					placeholder="123ABC"
+					pattern="^[0-9]{3}[A-Z]{3}$"
+				>
+			</div>
+
+			<div class="form-group">
+				<button class="btn btn-primary input-group-btn" type="submit">
+					Link
+				</button>
+			</div>
+		</form>
+	</div>
+</div>

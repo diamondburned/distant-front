@@ -20,15 +20,21 @@
 		{{ end }}
 	</div>
 	{{ if $.IsLinked }}
-	<form class="chat-send" action="/chat" method="post">
-		<input type="text" placeholder="Type a message..." disabled>
-		<button type="submit" disabled>
+	<form id="chat-send" action="/chat" method="post" autocomplete="off">
+		<a
+			class="btn btn-error tooltip-right"
+			href="/link?unlinked=1" data-tooltip="Log Out"
+		>
+			<i class="icon icon-cross"></i>
+		</a>
+		<input type="text" name="m" placeholder="Type a message...">
+		<button type="submit" class="btn btn-primary">
 			<i aria-label="Send" class="icon icon-message"></i>
 		</button>
 	</form>
 	{{ else }}
-	<a class="auth" href="/chat/authenticate">
-		<i class="icon icon-people"></i> Authenticate
+	<a id="chat-auth" href="/link">
+		<i class="icon icon-link"></i> Link
 	</a>
 	{{ end }}
 </div>

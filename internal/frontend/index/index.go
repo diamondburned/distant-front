@@ -6,6 +6,7 @@ import (
 
 	"github.com/diamondburned/distant-front/internal/frontend"
 	"github.com/diamondburned/distant-front/internal/frontend/index/chat"
+	"github.com/diamondburned/distant-front/internal/frontend/index/link"
 	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
 	"github.com/go-chi/chi"
@@ -70,7 +71,10 @@ func Mount(rs frontend.RenderState) http.Handler {
 	r := chi.NewRouter()
 	r.Use(frontend.InjectRenderState(rs))
 
-	r.Mount("/chat", chat.Mount())
+	r.Group(func(r chi.Router) {
+		r.Mount("/chat", chat.Mount())
+		r.Mount("/link", link.Mount())
+	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(tmplutil.AlwaysFlush)
@@ -79,6 +83,13 @@ func Mount(rs frontend.RenderState) http.Handler {
 	})
 
 	return r
+}
+
+func noSniff(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func renderIndex(w http.ResponseWriter, r *http.Request) {
