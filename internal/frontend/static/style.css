@@ -289,3 +289,48 @@ div#authenticate-page div.form-group:not(:last-child) {
 	margin-top:    0.4rem;
     margin-bottom: 0.8rem;
 }
+
+@media (prefers-color-scheme: dark) {
+body {
+        background: #1f1f1f;
+        color: #fff;
+}
+
+div.refresh-bar, div.refresh-bar div.refresh-inner {
+        background-color: rgb(255 255 255);
+
+}
+
+a {
+        color: #6d6cde
+}
+
+.card {
+        background: #191919;
+        border: none;
+}
+
+.chip {
+        background: #353535;
+}
+
+.empty {
+        color: #fff;
+}
+
+div.card {
+        box-shadow: 0px 0px 6px -2px rgb(0 0 0);
+}
+
+a.navbar-brand.text-bold {
+        color: #6d6cde
+}
+
+div.active-playlist {
+        border-color: #5150dc;
+}
+
+:root {
+        --glow: 0px 0px 4px 0px rgb(82 80 224 / 50%);
+}
+}
