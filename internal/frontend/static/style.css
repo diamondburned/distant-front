@@ -1,5 +1,5 @@
 :root {
-	--glow: 0px 0px 4px 0px rgba(128,127,226,0.5);
+	--glow: 0px 0px 4px 0px rgba(128, 127, 226, 0.5);
 }
 
 header.navbar {
@@ -18,14 +18,14 @@ div.mini-table span:nth-child(odd) {
 }
 
 div.card {
-	box-shadow: 0px 0px 6px -2px rgba(0,0,0,0.2);
+	box-shadow: 0px 0px 6px -2px rgba(0, 0, 0, 0.2);
 	border-radius: 4px;
 	margin-bottom: 0.8rem;
 }
 
 div.card-body div.empty {
 	background: none;
-	padding-top:    0rem;
+	padding-top: 0rem;
 	padding-bottom: 1rem;
 }
 
@@ -40,7 +40,7 @@ div.active-playlist {
 }
 
 div.playlist-entry img.playlist-thumb {
-	width:  56px;
+	width: 56px;
 	height: auto;
 	border-radius: 4px;
 }
@@ -71,9 +71,9 @@ div#chat > a > div.under {
 
 div#chat > a > div.popup-overlay {
 	position: absolute;
-	width:  100%;
+	width: 100%;
 	height: 100%;
-	top:  0;
+	top: 0;
 	left: 0;
 	background-color: rgba(0, 0, 0, 0.02);
 
@@ -103,9 +103,9 @@ div.messages {
 
 div#players div.player,
 div#players div.card-header {
-    display: flex;
+	display: flex;
 	align-items: center;
-    justify-content: space-between;
+	justify-content: space-between;
 }
 
 div#players div.player-info,
@@ -129,16 +129,16 @@ div.player-info span.flag {
 }
 
 div.car-colors {
-	margin-left:   0.4rem;
+	margin-left: 0.4rem;
 	border-radius: 3px;
 	overflow: hidden;
 
 	border: 1px solid black;
-	box-shadow: 0px 0px 5px -1px rgba(0,0,0,0.75);
+	box-shadow: 0px 0px 5px -1px rgba(0, 0, 0, 0.75);
 }
 
 div.car-colors > div {
-	width:  0.6rem;
+	width: 0.6rem;
 	height: 0.9rem;
 }
 
@@ -181,14 +181,24 @@ div.refresh-bar.error div.refresh-inner {
 }
 
 @keyframes expand {
-	from { width:  0px; }
-	to   { width: 25px; }
+	from {
+		width: 0px;
+	}
+	to {
+		width: 25px;
+	}
 }
 
 @keyframes breathing {
-	  0% { opacity: 95%; }
-	 50% { opacity: 15%; }
-	100% { opacity: 95%; }
+	0% {
+		opacity: 95%;
+	}
+	50% {
+		opacity: 15%;
+	}
+	100% {
+		opacity: 95%;
+	}
 }
 
 div#chat-box {
@@ -214,7 +224,7 @@ div#chat-box div.chat-message {
 div#chat-box div.chat-message small.timestamp {
 	opacity: 0.75;
 	text-align: right;
-	paddig-right: 0.4em;
+	padding-right: 0.4em;
 }
 
 a#chat-auth {
@@ -229,7 +239,7 @@ div.message-composer form input {
 	border: none;
 	border-radius: 4px;
 
-	margin:  0.2em;
+	margin: 0.2em;
 	padding: 0.2em 0.4em;
 }
 
@@ -286,51 +296,51 @@ div#authenticate-page form.card-body {
 }
 
 div#authenticate-page div.form-group:not(:last-child) {
-	margin-top:    0.4rem;
-    margin-bottom: 0.8rem;
+	margin-top: 0.4rem;
+	margin-bottom: 0.8rem;
 }
 
 @media (prefers-color-scheme: dark) {
-body {
-        background: #1f1f1f;
-        color: #fff;
-}
+	body {
+		background: #1f1f1f;
+		color: #fff;
+	}
 
-div.refresh-bar, div.refresh-bar div.refresh-inner {
-        background-color: rgb(255 255 255);
+	div.refresh-bar,
+	div.refresh-bar div.refresh-inner {
+		background-color: rgb(255 255 255);
+	}
 
-}
+	a {
+		color: #6d6cde
+	}
 
-a {
-        color: #6d6cde
-}
+	.card {
+		background: #191919;
+		border: none;
+	}
 
-.card {
-        background: #191919;
-        border: none;
-}
+	.chip {
+		background: #353535;
+	}
 
-.chip {
-        background: #353535;
-}
+	.empty {
+		color: #fff;
+	}
 
-.empty {
-        color: #fff;
-}
+	div.card {
+		box-shadow: 0px 0px 6px -2px rgb(0 0 0);
+	}
 
-div.card {
-        box-shadow: 0px 0px 6px -2px rgb(0 0 0);
-}
+	a.navbar-brand.text-bold {
+		color: #6d6cde
+	}
 
-a.navbar-brand.text-bold {
-        color: #6d6cde
-}
+	div.active-playlist {
+		border-color: #5150dc;
+	}
 
-div.active-playlist {
-        border-color: #5150dc;
-}
-
-:root {
-        --glow: 0px 0px 4px 0px rgb(82 80 224 / 50%);
-}
+	:root {
+		--glow: 0px 0px 4px 0px rgb(82 80 224 / 50%);
+	}
 }
