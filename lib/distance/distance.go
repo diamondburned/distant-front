@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 	"sync"
 	"time"
@@ -79,6 +80,7 @@ func (c *Client) doJSON(
 
 	u.Scheme = c.endpoint.Scheme
 	u.Host = c.endpoint.Host
+	u.Path = path.Join(c.endpoint.Path, u.Path)
 
 	var body io.Reader
 	if in != nil {
