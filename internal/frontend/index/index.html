@@ -112,10 +112,14 @@
 						{{- if (eq $activeID .Index) }} active-playlist {{- end -}}"
 				>
 					<div class="tile-icon">
+						{{ if .WorkshopFileID }}
 						<img
 							class="playlist-thumb" alt="Thumbnail" loading="lazy"
 							src="/workshopimg/{{.WorkshopFileID}}?size=128"
 						/>
+						{{ else }}
+						<img class="playlist-thumb" alt="Map" />
+						{{ end }}
 					</div>
 					<div class="tile-content">
 						<div class="tile-title">

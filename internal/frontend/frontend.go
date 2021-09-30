@@ -2,7 +2,9 @@ package frontend
 
 import (
 	"context"
+	"embed"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
@@ -10,16 +12,17 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
 	"github.com/diamondburned/distant-front/lib/distance/markup"
+	"github.com/diamondburned/tmplutil"
 	"github.com/lucasb-eyer/go-colorful"
-	"github.com/phogolabs/parcello"
 )
 
-//go:generate go run github.com/phogolabs/parcello/cmd/parcello -r -i *.go
+//go:embed *
+var embedFS embed.FS
 
 var Templater = tmplutil.Templater{
+	FileSystem: embedFS,
 	Includes: map[string]string{
 		"css":        "components/css.html",
 		"header":     "components/header.html",
@@ -105,10 +108,10 @@ func ExecuteNamedTemplate(w http.ResponseWriter, r *http.Request, name string) {
 
 // MountStatic mounts the static route.
 func MountStatic() http.Handler {
-	d, err := parcello.Manager.Dir("static/")
+	d, err := fs.Sub(embedFS, "static")
 	if err != nil {
-		log.Fatalln("Static not found:", err)
+		log.Fatalln("embedFS: static not found:", err)
 	}
 
-	return http.StripPrefix("/static", http.FileServer(d))
+	return http.StripPrefix("/static", http.FileServer(http.FS(d)))
 }

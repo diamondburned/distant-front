@@ -340,6 +340,10 @@ div#authenticate-page div.form-group:not(:last-child) {
 		border-color: #5150dc;
 	}
 
+	div.playlist-entry img.playlist-thumb {
+		box-shadow: 0 0 5px 0px rgba(0, 0, 0, 0.5);
+	}
+
 	:root {
 		--glow: 0px 0px 4px 0px rgb(82 80 224 / 50%);
 	}

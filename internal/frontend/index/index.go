@@ -7,8 +7,8 @@ import (
 	"github.com/diamondburned/distant-front/internal/frontend"
 	"github.com/diamondburned/distant-front/internal/frontend/index/chat"
 	"github.com/diamondburned/distant-front/internal/frontend/index/link"
-	"github.com/diamondburned/distant-front/internal/tmplutil"
 	"github.com/diamondburned/distant-front/lib/distance"
+	"github.com/diamondburned/tmplutil"
 	"github.com/go-chi/chi"
 )
 
