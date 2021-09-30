@@ -27,6 +27,7 @@ func main() {
 		siteName   = os.Getenv("DISTANCE_NAME")
 		privToken  = os.Getenv("DISTANCE_PRIVTOKEN")
 		listenAddr = os.Getenv("DISTANCE_LISTEN")
+		observeFq  = os.Getenv("DISTANCE_OBSERVEFQ")
 	)
 
 	// Make all colors darker.
@@ -53,9 +54,18 @@ func main() {
 		log.Println("Warning: workshop cache load error:", err)
 	}
 
+	observeFreq := 500 * time.Millisecond
+	if observeFq != "" {
+		d, err := time.ParseDuration(observeFq)
+		if err != nil {
+			log.Fatalln("invalid DISTANCE_OBSERVEFQ:", err)
+		}
+		observeFreq = d
+	}
+
 	rs := frontend.RenderState{
 		Client:      c,
-		Observer:    distance.NewObserver(c, 500*time.Millisecond),
+		Observer:    distance.NewObserver(c, observeFreq),
 		SiteName:    siteName,
 		DistanceURL: distanceURL,
 	}
