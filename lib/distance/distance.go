@@ -264,9 +264,7 @@ func (obs *Observer) Subscribe() (<-chan ObservedState, func()) {
 		obs.subMu.Lock()
 		// Check that the subscribed state still exists. We should only delete
 		// it if it does.
-		if _, ok := obs.subs[observee]; ok {
-			delete(obs.subs, observee)
-		}
+		delete(obs.subs, observee)
 		obs.subMu.Unlock()
 
 		// Only close the observee channel after deleting from the map and
